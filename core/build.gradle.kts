@@ -23,7 +23,9 @@ dependencies {
     implementation(kotlin("reflect"))
 
     implementation("org.apache.kafka:kafka-clients:2.0.0")
+    implementation("org.apache.kafka:kafka-streams:2.1.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+")
+    implementation("com.owlike:genson:1.4")
 
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))

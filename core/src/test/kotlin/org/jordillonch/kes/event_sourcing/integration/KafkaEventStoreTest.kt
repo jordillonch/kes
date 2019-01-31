@@ -12,7 +12,10 @@ class KafkaEventStoreTest : ShouldSpec(
             AggregateLifeCycle.init(eventStore)
 
             should(" ") {
-                val aggregate = FooAggregate.create(FooId.random())
+                val id = FooId.random()
+                val aggregate = FooAggregate.create(id)
+                Thread.sleep(1000)
+                eventStore.load(::FooAggregate, id)
             }
         }
 )
