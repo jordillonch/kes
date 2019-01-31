@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    kotlin("jvm") version "1.3.0"
+    kotlin("jvm") version "1.3.20"
     java
 }
 
@@ -21,6 +21,10 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
+
+    implementation("org.apache.kafka:kafka-clients:2.0.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+")
+
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))
     testCompile("io.kotlintest:kotlintest-runner-junit5:3.1.10")
