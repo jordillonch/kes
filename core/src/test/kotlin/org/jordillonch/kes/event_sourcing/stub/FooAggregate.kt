@@ -4,9 +4,10 @@ import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.event_sourcing.domain.AggregateId
 import org.jordillonch.kes.event_sourcing.domain.AggregateLifeCycle
 import org.jordillonch.kes.event_sourcing.infrastructure.AbstractAggregate
-import java.util.UUID
+import java.io.Serializable
+import java.util.*
 
-class FooAggregate : AbstractAggregate() {
+class FooAggregate : AbstractAggregate(), Serializable {
 
     lateinit var id: FooId private set
 
