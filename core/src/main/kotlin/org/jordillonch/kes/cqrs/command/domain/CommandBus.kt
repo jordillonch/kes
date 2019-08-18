@@ -1,5 +1,7 @@
 package org.jordillonch.kes.cqrs.command.domain
 
+import kotlin.reflect.KType
+
 interface Command
 
 interface CommandHandler<in C : Command> {
@@ -9,6 +11,7 @@ interface CommandHandler<in C : Command> {
 interface CommandBus {
     fun <C : Command> registerHandler(handler: CommandHandler<C>)
     fun <C : Command> registerHandler(handler: (C) -> Unit)
+    fun <C : Command> registerHandler(command: Class<*>, handler: (C) -> Unit)
     fun handle(command: Command)
 }
 

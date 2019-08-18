@@ -4,6 +4,7 @@ import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus
 import org.jordillonch.kes.cqrs.event.domain.EventHandler
 import java.util.concurrent.Executors
+import kotlin.reflect.KType
 
 class AsyncSimpleEventBus(poolSize: Int = 4) : EventBus {
     private val simpleEventBus = SimpleEventBus()
@@ -15,6 +16,10 @@ class AsyncSimpleEventBus(poolSize: Int = 4) : EventBus {
 
     override fun <E : Event> registerHandler(handler: (E) -> Unit) {
         simpleEventBus.registerHandler(handler)
+    }
+
+    override fun <E : Event> registerHandler(eventType: Class<*>, handler: (E) -> Unit) {
+        simpleEventBus.registerHandler(eventType, handler)
     }
 
     override fun publish(event: Event) {

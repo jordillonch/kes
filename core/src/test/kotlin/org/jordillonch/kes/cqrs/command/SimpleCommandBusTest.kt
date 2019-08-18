@@ -11,40 +11,53 @@ import org.jordillonch.kes.cqrs.command.infrastructure.SimpleCommandBus
 import org.jordillonch.kes.faker.Faker
 
 class SimpleCommandBusTest : ShouldSpec(
-        {
-            should("register a handler and then handle it") {
-                val bus = SimpleCommandBus()
+    {
+        should("register a handler and then handle it") {
+            val bus = SimpleCommandBus()
 
-                val handler = TestCommandHandler()
-                bus.registerHandler(handler)
+            val handler = TestCommandHandler()
+            bus.registerHandler(handler)
 
-                val testValue = Faker.instance().number().randomNumber()
-                val command = TestCommand(testValue)
+            val testValue = Faker.instance().number().randomNumber()
+            val command = TestCommand(testValue)
 
-                bus.handle(command)
-                assertThat(testValue, equalTo(handler.testValueToAssert))
+            bus.handle(command)
+            assertThat(testValue, equalTo(handler.testValueToAssert))
+        }
+
+        should("register a lambda handler and then handle it") {
+            val bus = SimpleCommandBus()
+
+            var handleTestValue: Long? = null
+            bus.registerHandler { command: TestCommand -> handleTestValue = command.id }
+
+            val testValue = Faker.instance().number().randomNumber()
+            val command = TestCommand(testValue)
+
+            bus.handle(command)
+            assertThat(testValue, equalTo(handleTestValue))
+        }
+
+        should("register a lambda command-handler and then handle it") {
+            val bus = SimpleCommandBus()
+
+            var handleTestValue: Long? = null
+            bus.registerHandler(TestCommand::class.java) { command: TestCommand -> handleTestValue = command.id }
+
+            val testValue = Faker.instance().number().randomNumber()
+            val command = TestCommand(testValue)
+
+            bus.handle(command)
+            assertThat(testValue, equalTo(handleTestValue))
+        }
+
+        should("fail because no registered handler") {
+            val bus = SimpleCommandBus()
+            shouldThrow<NoCommandHandlerFoundException> {
+                bus.handle(TestCommand(1))
             }
-
-            should("register a lambda handler and then handle it") {
-                val bus = SimpleCommandBus()
-
-                var handleTestValue: Long? = null
-                bus.registerHandler { command: TestCommand -> handleTestValue = command.id }
-
-                val testValue = Faker.instance().number().randomNumber()
-                val command = TestCommand(testValue)
-
-                bus.handle(command)
-                assertThat(testValue, equalTo(handleTestValue))
-            }
-
-            should("fail because no registered handler") {
-                val bus = SimpleCommandBus()
-                shouldThrow<NoCommandHandlerFoundException> {
-                    bus.handle(TestCommand(1))
-                }
-            }
-        })
+        }
+    })
 
 private data class TestCommand(val id: Long) : Command
 
