@@ -8,29 +8,38 @@ import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.jvmErasure
+import kotlin.reflect.jvm.reflect
 
 class SimpleCommandBus : CommandBus {
-    private val handlers: MutableMap<String, CommandHandler<Command>> = mutableMapOf()
+    private val handlers: MutableMap<String, (Command) -> Unit> = mutableMapOf()
 
     override fun <C : Command> registerHandler(handler: CommandHandler<C>) {
         @Suppress("UNCHECKED_CAST")
-        handlers[classFrom(handler)] = handler as CommandHandler<Command>
+        handlers[classFrom(handler)] = { command: Command -> handler.on(command as C) }
+    }
+
+    override fun <C : Command> registerHandler(handler: (C) -> Unit) {
+        @Suppress("UNCHECKED_CAST")
+        handlers[classFrom(handler)] = handler as (Command) -> Unit
     }
 
     override fun handle(command: Command) {
         @Suppress("UNCHECKED_CAST")
         return handlers[command::class.qualifiedName]
-                       ?.on(command)
-               ?: throw NoCommandHandlerFoundException()
+            ?.invoke(command)
+            ?: throw NoCommandHandlerFoundException()
     }
 
+    private fun <C : Command> classFrom(handler: (C) -> Unit) =
+        handler.reflect()!!.parameters.first().type.toString()
+
     private fun <C : Command> classFrom(handler: CommandHandler<C>) =
-            handler.javaClass.kotlin
-                    .declaredFunctions
-                    .firstFunctionNamedOn()
-                    .mapParameterTypes()
-                    .first { it.isSubclassOf(Command::class) }
-                    .qualifiedName!!
+        handler.javaClass.kotlin
+            .declaredFunctions
+            .firstFunctionNamedOn()
+            .mapParameterTypes()
+            .first { it.isSubclassOf(Command::class) }
+            .qualifiedName!!
 
     private fun Collection<KFunction<*>>.firstFunctionNamedOn() = first { it.name == "on" }
 

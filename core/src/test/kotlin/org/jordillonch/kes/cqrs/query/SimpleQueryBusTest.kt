@@ -11,25 +11,36 @@ import org.jordillonch.kes.cqrs.query.infrastructure.SimpleQueryBus
 import org.jordillonch.kes.faker.Faker
 
 class SimpleQueryBusTest : ShouldSpec(
-        {
-            should("register a handler and then query it") {
-                val bus = SimpleQueryBus()
+    {
+        should("register a handler and then query it") {
+            val bus = SimpleQueryBus()
 
-                bus.registerHandler(TestQueryHandler())
+            bus.registerHandler(TestQueryHandler())
 
-                val testValue = Faker.instance().number().randomNumber()
-                val query = TestQuery(testValue)
+            val testValue = Faker.instance().number().randomNumber()
+            val query = TestQuery(testValue)
 
-                assertThat(bus.ask(query), equalTo(testValue))
+            assertThat(bus.ask(query), equalTo(testValue))
+        }
+
+        should("register a lambda handler and then query it") {
+            val bus = SimpleQueryBus()
+
+            bus.registerHandler { query: TestQuery -> query.id }
+
+            val testValue = Faker.instance().number().randomNumber()
+            val query = TestQuery(testValue)
+
+            assertThat(bus.ask(query), equalTo(testValue))
+        }
+
+        should("fail because no registered handler") {
+            val bus = SimpleQueryBus()
+            shouldThrow<NoQueryHandlerFoundException> {
+                bus.ask<Int>(TestQuery(1))
             }
-
-            should("fail because no registered handler") {
-                val bus = SimpleQueryBus()
-                shouldThrow<NoQueryHandlerFoundException> {
-                    bus.ask<Int>(TestQuery(1))
-                }
-            }
-        })
+        }
+    })
 
 private data class TestQuery(val id: Long) : Query
 

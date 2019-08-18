@@ -12,7 +12,7 @@ import org.jordillonch.kes.faker.Faker
 
 class SimpleCommandBusTest : ShouldSpec(
         {
-            should("register a handler and then query it") {
+            should("register a handler and then handle it") {
                 val bus = SimpleCommandBus()
 
                 val handler = TestCommandHandler()
@@ -23,6 +23,19 @@ class SimpleCommandBusTest : ShouldSpec(
 
                 bus.handle(command)
                 assertThat(testValue, equalTo(handler.testValueToAssert))
+            }
+
+            should("register a lambda handler and then handle it") {
+                val bus = SimpleCommandBus()
+
+                var handleTestValue: Long? = null
+                bus.registerHandler { command: TestCommand -> handleTestValue = command.id }
+
+                val testValue = Faker.instance().number().randomNumber()
+                val command = TestCommand(testValue)
+
+                bus.handle(command)
+                assertThat(testValue, equalTo(handleTestValue))
             }
 
             should("fail because no registered handler") {

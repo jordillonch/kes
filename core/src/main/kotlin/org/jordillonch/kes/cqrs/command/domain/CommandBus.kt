@@ -8,6 +8,7 @@ interface CommandHandler<in C : Command> {
 
 interface CommandBus {
     fun <C : Command> registerHandler(handler: CommandHandler<C>)
+    fun <C : Command> registerHandler(handler: (C) -> Unit)
     fun handle(command: Command)
 }
 

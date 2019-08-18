@@ -2,3 +2,6 @@
 build
 !gradle/wrapper/gradle-wrapper.jar
 logs
+core/out
+integration/spring/out
+integration/spring/gradle/wrapper

@@ -13,6 +13,10 @@ class AsyncSimpleEventBus(poolSize: Int = 4) : EventBus {
         simpleEventBus.registerHandler(handler)
     }
 
+    override fun <E : Event> registerHandler(handler: (E) -> Unit) {
+        simpleEventBus.registerHandler(handler)
+    }
+
     override fun publish(event: Event) {
         executor.submit {
             simpleEventBus.publish(event)
