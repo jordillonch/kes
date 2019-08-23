@@ -7,6 +7,7 @@ import org.jordillonch.kes.cqrs.event.domain.EventBus
 import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
@@ -26,8 +27,8 @@ abstract class Saga(
 
     abstract fun name(): String
 
-    fun associate(effectKClass: KClass<*>, associatedPropertyName: String, associatedPropertyValue: UUID) {
-        sagaStateRepository.associate(id, name(), effectKClass, associatedPropertyName, associatedPropertyValue)
+    fun associate(effectKClass: KClass<*>, associatedProperty: KProperty1<*, UUID>, associatedPropertyValue: UUID) {
+        sagaStateRepository.associate(id, name(), effectKClass, associatedProperty, associatedPropertyValue)
     }
 
     private fun registerEventHandlers() {

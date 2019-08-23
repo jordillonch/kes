@@ -5,7 +5,7 @@ import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.saga.domain.SagaStateRepository
 import java.util.UUID
 import kotlin.reflect.KClass
-import kotlin.reflect.full.memberProperties
+import kotlin.reflect.KProperty1
 
 class InMemorySagaStateRepository : SagaStateRepository {
     private val storeEffectClassToPropertyName = mutableMapOf<SagaEffect, String>()
@@ -16,10 +16,10 @@ class InMemorySagaStateRepository : SagaStateRepository {
         sagaId: UUID,
         sagaName: String,
         effectKClass: KClass<*>,
-        associatedPropertyName: String,
+        associatedProperty: KProperty1<*, UUID>,
         associatedPropertyValue: UUID
     ) {
-        storeEffectClassToPropertyName[SagaEffect(sagaName, effectKClass)] = associatedPropertyName
+        storeEffectClassToPropertyName[SagaEffect(sagaName, effectKClass)] = associatedProperty.name
         storeEffectPropertyValueToSagaId[
             SagaEffectAssociationValue(
                 SagaEffect(sagaName, effectKClass),

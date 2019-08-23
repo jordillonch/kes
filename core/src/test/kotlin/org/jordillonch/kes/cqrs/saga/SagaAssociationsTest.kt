@@ -48,8 +48,8 @@ class SagaAssociationsTest : ShouldSpec(
         var testEventCalled = false
 
         fun on(command: TestCommand) {
-            associate(TestCommand2::class, "testCommand2Id", command.id)
-            associate(TestEvent::class, "associatedId", command.eventId)
+            associate(TestCommand2::class, TestCommand2::testCommand2Id, command.testCommand2Id)
+            associate(TestEvent::class, TestEvent::associatedId, command.eventId)
             testCommandIdCalled = true
         }
 
