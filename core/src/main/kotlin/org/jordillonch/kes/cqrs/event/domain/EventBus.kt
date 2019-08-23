@@ -1,7 +1,5 @@
 package org.jordillonch.kes.cqrs.event.domain
 
-import kotlin.reflect.KType
-
 // TODO: add occurred on property
 interface Event
 

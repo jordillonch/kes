@@ -1,7 +1,5 @@
 package org.jordillonch.kes.cqrs.command.domain
 
-import kotlin.reflect.KType
-
 interface Command
 
 interface CommandHandler<in C : Command> {

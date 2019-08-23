@@ -10,6 +10,8 @@ import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus
 import org.jordillonch.kes.cqrs.event.infrastructure.SimpleEventBus
 import org.jordillonch.kes.cqrs.saga.domain.Saga
+import org.jordillonch.kes.cqrs.saga.domain.SagaStateRepository
+import org.jordillonch.kes.cqrs.saga.infrastructure.InMemorySagaStateRepository
 import org.jordillonch.kes.faker.Faker
 
 class SagaTest : ShouldSpec(
@@ -17,7 +19,8 @@ class SagaTest : ShouldSpec(
         should("register command and event handlers") {
             val commandBus = SimpleCommandBus()
             val eventBus = SimpleEventBus()
-            val saga = TestSaga(commandBus, eventBus)
+            val sagaStateRepository = InMemorySagaStateRepository()
+            val saga = TestSaga(commandBus, eventBus, sagaStateRepository)
 
             val testCommandValue = Faker.instance().number().randomNumber()
             val command = TestCommand(testCommandValue)
@@ -31,21 +34,24 @@ class SagaTest : ShouldSpec(
             assertThat(testEventValue, equalTo(saga.testEventValueToAssert))
         }
     }
-)
+) {
+    class TestSaga(commandBus: CommandBus, eventBus: EventBus, sagaStateRepository: SagaStateRepository) : Saga
+        (commandBus, eventBus, sagaStateRepository) {
 
-class TestSaga(commandBus: CommandBus, eventBus: EventBus) : Saga(commandBus, eventBus) {
+        override fun name() = "test_saga"
 
-    var testCommandValueToAssert: Long? = null
-    var testEventValueToAssert: Long? = null
+        var testCommandValueToAssert: Long? = null
+        var testEventValueToAssert: Long? = null
 
-    fun on(command: TestCommand) {
-        testCommandValueToAssert = command.id
+        fun on(command: TestCommand) {
+            testCommandValueToAssert = command.id
+        }
+
+        fun on(event: TestEvent) {
+            testEventValueToAssert = event.id
+        }
     }
 
-    fun on(event: TestEvent) {
-        testEventValueToAssert = event.id
-    }
+    data class TestCommand(val id: Long) : Command
+    data class TestEvent(val id: Long) : Event
 }
-
-data class TestCommand(val id: Long) : Command
-data class TestEvent(val id: Long) : Event
