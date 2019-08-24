@@ -9,6 +9,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredFunctions
+import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
@@ -43,7 +44,6 @@ abstract class Saga(
             .forEach { registerHandler(it) }
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun registerHandler(handler: KFunction<*>) {
         val effectType = handler.parameters[1].type.jvmErasure
         if (effectType.isSubclassOf(Command::class)) {
@@ -53,7 +53,6 @@ abstract class Saga(
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun handler(handler: KFunction<*>): (Effect) -> Unit =
         { effect: Effect ->
             recoverSagaState(effect)
@@ -72,6 +71,7 @@ abstract class Saga(
             }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun saveSagaState() {
         this.javaClass.kotlin.memberProperties
             .associateBy { it.name }
