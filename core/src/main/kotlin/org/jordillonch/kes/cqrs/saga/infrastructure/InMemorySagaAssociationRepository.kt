@@ -1,5 +1,6 @@
 package org.jordillonch.kes.cqrs.saga.infrastructure
 
+import org.jordillonch.kes.cqrs.Effect
 import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.saga.domain.SagaAssociationRepository
@@ -15,9 +16,9 @@ class InMemorySagaAssociationRepository : SagaAssociationRepository {
     override fun associate(
         sagaId: SagaId,
         sagaName: String,
-        effectKClass: KClass<*>,
-        associatedProperty: KProperty1<*, UUID>,
-        associatedPropertyValue: UUID
+        effectKClass: KClass<out Effect>,
+        associatedProperty: KProperty1<*, Any>,
+        associatedPropertyValue: Any
     ) {
         storeEffectClassToPropertyName[SagaEffect(sagaName, effectKClass)] = associatedProperty.name
         storeEffectPropertyValueToSagaId[
@@ -27,11 +28,7 @@ class InMemorySagaAssociationRepository : SagaAssociationRepository {
             )] = sagaId
     }
 
-    override fun find(sagaName: String, command: Command): SagaId? = findAny(sagaName, command)
-
-    override fun find(sagaName: String, event: Event): SagaId? = findAny(sagaName, event)
-
-    private fun findAny(sagaName: String, effect: Any): SagaId? {
+    override fun find(sagaName: String, effect: Effect): SagaId? {
         val sagaEffect = SagaEffect(sagaName, effect.javaClass.kotlin)
         return storeEffectClassToPropertyName[sagaEffect]
             ?.let { associatedPropertyName ->
@@ -48,11 +45,11 @@ class InMemorySagaAssociationRepository : SagaAssociationRepository {
 
     private data class SagaEffect(
         val sagaName: String,
-        val effectKClass: KClass<*>
+        val effectKClass: KClass<out Effect>
     )
 
     private data class SagaEffectAssociationValue(
         val sagaEffect: SagaEffect,
-        val associatedPropertyValue: UUID
+        val associatedPropertyValue: Any
     )
 }

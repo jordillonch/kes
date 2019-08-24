@@ -1,5 +1,6 @@
 package org.jordillonch.kes.cqrs.saga.domain
 
+import org.jordillonch.kes.cqrs.Effect
 import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.event.domain.Event
 import java.util.UUID
@@ -10,10 +11,9 @@ interface SagaAssociationRepository {
     fun associate(
         sagaId: SagaId,
         sagaName: String,
-        effectKClass: KClass<*>,
-        associatedProperty: KProperty1<*, UUID>,
-        associatedPropertyValue: UUID
+        effectKClass: KClass<out Effect>,
+        associatedProperty: KProperty1<*, Any>,
+        associatedPropertyValue: Any
     )
-    fun find(sagaName: String, command: Command): SagaId?
-    fun find(sagaName: String, command: Event): SagaId?
+    fun find(sagaName: String, effect: Effect): SagaId?
 }

@@ -1,6 +1,8 @@
 package org.jordillonch.kes.cqrs.command.domain
 
-interface Command
+import org.jordillonch.kes.cqrs.Effect
+
+interface Command : Effect
 
 interface CommandHandler<in C : Command> {
     fun on(command: C)

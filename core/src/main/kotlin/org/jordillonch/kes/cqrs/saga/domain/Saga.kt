@@ -1,5 +1,6 @@
 package org.jordillonch.kes.cqrs.saga.domain
 
+import org.jordillonch.kes.cqrs.Effect
 import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.command.domain.CommandBus
 import org.jordillonch.kes.cqrs.event.domain.Event
@@ -28,7 +29,7 @@ abstract class Saga(
 
     abstract fun name(): String
 
-    fun associate(effectKClass: KClass<*>, associatedProperty: KProperty1<*, UUID>, associatedPropertyValue: UUID) {
+    fun associate(effectKClass: KClass<out Effect>, associatedProperty: KProperty1<*, UUID>, associatedPropertyValue: UUID) {
         sagaAssociationRepository.associate(id, name(), effectKClass, associatedProperty, associatedPropertyValue)
     }
 
