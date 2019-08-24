@@ -1,9 +1,6 @@
 package org.jordillonch.kes.cqrs.saga.domain
 
 import org.jordillonch.kes.cqrs.Effect
-import org.jordillonch.kes.cqrs.command.domain.Command
-import org.jordillonch.kes.cqrs.event.domain.Event
-import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 

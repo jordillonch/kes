@@ -9,7 +9,6 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
@@ -18,13 +17,15 @@ abstract class Saga(
     private val commandBus: CommandBus,
     private val eventBus: EventBus,
     private val sagaAssociationRepository: SagaAssociationRepository,
-    private val sagaStateRepository: SagaStateRepository
+    private val sagaStateRepository: SagaStateRepository,
+    registerHandlers: Boolean = true // FIXME: improve register once
 ) {
-    private val id = SagaId.new()
 
     init {
-        registerHandlers()
+        if (registerHandlers) registerHandlers()
     }
+
+    val id = SagaId.new()
 
     abstract fun name(): String
 
@@ -55,27 +56,36 @@ abstract class Saga(
 
     private fun handler(handler: KFunction<*>): (Effect) -> Unit =
         { effect: Effect ->
-            recoverSagaState(effect)
-            handler.call(this, effect)
-            saveSagaState()
+            val shadowSagaInstance = recoverSagaState(effect)
+            handler.call(shadowSagaInstance, effect)
+            saveSagaState(shadowSagaInstance)
         }
 
-    private fun recoverSagaState(effect: Effect) {
+    private fun recoverSagaState(effect: Effect): Saga {
+        val sagaInstance = this.javaClass.kotlin.constructors
+            .first()
+            .call(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository, false)
         sagaAssociationRepository
             .find(name(), effect)
             ?.let { sagaStateRepository.find(it) }
             ?.forEach { name, value ->
-                this.javaClass.getDeclaredField(name)
+                if ("id" == name) {
+                    sagaInstance.javaClass.superclass
+                } else {
+                    sagaInstance.javaClass
+                }
+                    .getDeclaredField(name)
                     .also { it.isAccessible = true }
-                    .set(this, value)
+                    .set(sagaInstance, value)
             }
+        return sagaInstance
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun saveSagaState() {
-        this.javaClass.kotlin.memberProperties
+    private fun saveSagaState(sagaInstance: Saga) {
+        sagaInstance.javaClass.kotlin.memberProperties
             .associateBy { it.name }
-            .map { (k, v) -> k to v.get(this) }
-            .run { sagaStateRepository.save(id, toMap() as Map<String, Any>) }
+            .map { (k, v) -> k to v.get(sagaInstance) }
+            .run { sagaStateRepository.save(sagaInstance.id, toMap() as Map<String, Any>) }
     }
 }

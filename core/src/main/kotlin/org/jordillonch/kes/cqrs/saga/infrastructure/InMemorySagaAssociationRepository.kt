@@ -1,8 +1,6 @@
 package org.jordillonch.kes.cqrs.saga.infrastructure
 
 import org.jordillonch.kes.cqrs.Effect
-import org.jordillonch.kes.cqrs.command.domain.Command
-import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.saga.domain.SagaAssociationRepository
 import org.jordillonch.kes.cqrs.saga.domain.SagaId
 import java.util.UUID
@@ -32,14 +30,14 @@ class InMemorySagaAssociationRepository : SagaAssociationRepository {
         val sagaEffect = SagaEffect(sagaName, effect.javaClass.kotlin)
         return storeEffectClassToPropertyName[sagaEffect]
             ?.let { associatedPropertyName ->
-                storeEffectPropertyValueToSagaId[
-                    SagaEffectAssociationValue(
-                        sagaEffect,
-                        effect.javaClass
-                            .getDeclaredField(associatedPropertyName)
-                            .also { it.isAccessible = true }
-                            .get(effect) as UUID
-                    )]
+                SagaEffectAssociationValue(
+                    sagaEffect,
+                    effect.javaClass
+                        .getDeclaredField(associatedPropertyName)
+                        .also { it.isAccessible = true }
+                        .get(effect) as UUID
+                )
+                    .let { storeEffectPropertyValueToSagaId[it] }
             }
     }
 
