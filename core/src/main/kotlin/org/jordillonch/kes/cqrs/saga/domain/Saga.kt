@@ -53,28 +53,29 @@ abstract class Saga(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun handler(handler: KFunction<*>): (Effect) -> Unit =
         { effect: Effect ->
-            // get saga state from repository
-            val state = sagaAssociationRepository
-                .find(name(), effect)
-                ?.let { sagaStateRepository.find(it) }
-            // set state to current saga
-            state?.forEach { name, value ->
+            recoverSagaState(effect)
+            handler.call(this, effect)
+            saveSagaState()
+        }
+
+    private fun recoverSagaState(effect: Effect) {
+        sagaAssociationRepository
+            .find(name(), effect)
+            ?.let { sagaStateRepository.find(it) }
+            ?.forEach { name, value ->
                 this.javaClass.getDeclaredField(name)
                     .also { it.isAccessible = true }
                     .set(this, value)
             }
+    }
 
-            // call handler
-            handler.call(this, effect)
-
-            // get current saga state
-            val newState = this.javaClass.kotlin.memberProperties
-                .associateBy { it.name }
-                .map { (k, v) -> k to v.get(this) }
-                .toMap() as Map<String, Any>
-            // save current saga state
-            sagaStateRepository.save(id, newState)
-        }
+    private fun saveSagaState() {
+        this.javaClass.kotlin.memberProperties
+            .associateBy { it.name }
+            .map { (k, v) -> k to v.get(this) }
+            .run { sagaStateRepository.save(id, toMap() as Map<String, Any>) }
+    }
 }
