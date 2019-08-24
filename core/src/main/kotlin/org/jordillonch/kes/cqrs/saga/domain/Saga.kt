@@ -5,7 +5,6 @@ import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.command.domain.CommandBus
 import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus
-import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty1
@@ -23,48 +22,52 @@ abstract class Saga(
     private val id = SagaId.new()
 
     init {
-        registerCommandHandlers()
-        registerEventHandlers()
+        registerHandlers()
     }
 
     abstract fun name(): String
 
-    fun associate(effectKClass: KClass<out Effect>, associatedProperty: KProperty1<*, UUID>, associatedPropertyValue: UUID) {
+    fun associate(
+        effectKClass: KClass<out Effect>,
+        associatedProperty: KProperty1<*, Any>,
+        associatedPropertyValue: Any
+    ) {
         sagaAssociationRepository.associate(id, name(), effectKClass, associatedProperty, associatedPropertyValue)
     }
 
-    private fun registerEventHandlers() {
+    private fun registerHandlers() {
         this.javaClass.kotlin.declaredFunctions
             .filter { kFunction ->
-                kFunction.parameters.any { it.type.jvmErasure.isSubclassOf(Event::class) } }
-            .forEach { registerEventHandler(it) }
-    }
-
-    private fun registerCommandHandlers() {
-        this.javaClass.kotlin.declaredFunctions
-            .filter { kFunction ->
-                kFunction.parameters.any { it.type.jvmErasure.isSubclassOf(Command::class) } }
-            .forEach { registerCommandHandler(it) }
+                kFunction.parameters.any { it.type.jvmErasure.isSubclassOf(Effect::class) }
+            }
+            .forEach { registerHandler(it) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun registerCommandHandler(handler: KFunction<*>) {
-        val commandType = handler.parameters[1].type.jvmErasure.java
-        commandBus.registerHandler(commandType) { command: Command ->
-            // handler function
+    private fun registerHandler(handler: KFunction<*>) {
+        val effectType = handler.parameters[1].type.jvmErasure
+        if (effectType.isSubclassOf(Command::class)) {
+            commandBus.registerHandler(effectType.java, handler(handler))
+        } else if (effectType.isSubclassOf(Event::class)) {
+            eventBus.registerHandler(effectType.java, handler(handler))
+        }
+    }
 
+    private fun handler(handler: KFunction<*>): (Effect) -> Unit =
+        { effect: Effect ->
             // get saga state from repository
             val state = sagaAssociationRepository
-                .find(name(), command)
+                .find(name(), effect)
                 ?.let { sagaStateRepository.find(it) }
             // set state to current saga
             state?.forEach { name, value ->
                 this.javaClass.getDeclaredField(name)
                     .also { it.isAccessible = true }
-                    .set(this, value) }
+                    .set(this, value)
+            }
 
             // call handler
-            handler.call(this, command)
+            handler.call(this, effect)
 
             // get current saga state
             val newState = this.javaClass.kotlin.memberProperties
@@ -74,34 +77,4 @@ abstract class Saga(
             // save current saga state
             sagaStateRepository.save(id, newState)
         }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun registerEventHandler(handler: KFunction<*>) {
-        val eventType = handler.parameters[1].type.jvmErasure.java
-        eventBus.registerHandler(eventType) { event: Event ->
-            // handler function
-
-            // get saga state from repository
-            val state = sagaAssociationRepository
-                .find(name(), event)
-                ?.let { sagaStateRepository.find(it) }
-            // set state to current saga
-            state?.forEach { name, value ->
-                this.javaClass.getDeclaredField(name)
-                    .also { it.isAccessible = true }
-                    .set(this, value) }
-
-            // call handler
-            handler.call(this, event)
-
-            // get current saga state
-            val newState = this.javaClass.kotlin.memberProperties
-                .associateBy { it.name }
-                .map { (k, v) -> k to v.get(this) }
-                .toMap() as Map<String, Any>
-            // save current saga state
-            sagaStateRepository.save(id, newState)
-        }
-    }
 }
