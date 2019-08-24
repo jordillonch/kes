@@ -8,7 +8,9 @@ import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus
 import org.jordillonch.kes.cqrs.event.infrastructure.SimpleEventBus
 import org.jordillonch.kes.cqrs.saga.domain.Saga
+import org.jordillonch.kes.cqrs.saga.domain.SagaAssociationRepository
 import org.jordillonch.kes.cqrs.saga.domain.SagaStateRepository
+import org.jordillonch.kes.cqrs.saga.infrastructure.InMemorySagaAssociationRepository
 import org.jordillonch.kes.cqrs.saga.infrastructure.InMemorySagaStateRepository
 import java.util.UUID
 import kotlin.test.assertTrue
@@ -18,8 +20,9 @@ class SagaAssociationsTest : ShouldSpec(
         should("register command and event handlers") {
             val commandBus = SimpleCommandBus()
             val eventBus = SimpleEventBus()
+            val sagaAssociationRepository = InMemorySagaAssociationRepository()
             val sagaStateRepository = InMemorySagaStateRepository()
-            val saga = TestAssociationSaga(commandBus, eventBus, sagaStateRepository)
+            val saga = TestAssociationSaga(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository)
 
             val testCommandId = UUID.randomUUID()
             val testCommand2Id = UUID.randomUUID()
@@ -38,8 +41,13 @@ class SagaAssociationsTest : ShouldSpec(
         }
     }
 ) {
-    class TestAssociationSaga(commandBus: CommandBus, eventBus: EventBus, sagaStateRepository: SagaStateRepository) :
-        Saga(commandBus, eventBus, sagaStateRepository) {
+    class TestAssociationSaga(
+        commandBus: CommandBus,
+        eventBus: EventBus,
+        sagaAssociationRepository: SagaAssociationRepository,
+        sagaStateRepository: SagaStateRepository
+    ) :
+        Saga(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository) {
 
         override fun name() = "test_association_saga"
 

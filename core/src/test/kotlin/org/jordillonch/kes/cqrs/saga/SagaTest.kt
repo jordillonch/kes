@@ -10,7 +10,9 @@ import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus
 import org.jordillonch.kes.cqrs.event.infrastructure.SimpleEventBus
 import org.jordillonch.kes.cqrs.saga.domain.Saga
+import org.jordillonch.kes.cqrs.saga.domain.SagaAssociationRepository
 import org.jordillonch.kes.cqrs.saga.domain.SagaStateRepository
+import org.jordillonch.kes.cqrs.saga.infrastructure.InMemorySagaAssociationRepository
 import org.jordillonch.kes.cqrs.saga.infrastructure.InMemorySagaStateRepository
 import org.jordillonch.kes.faker.Faker
 
@@ -19,8 +21,9 @@ class SagaTest : ShouldSpec(
         should("register command and event handlers") {
             val commandBus = SimpleCommandBus()
             val eventBus = SimpleEventBus()
+            val sagaAssociationRepository = InMemorySagaAssociationRepository()
             val sagaStateRepository = InMemorySagaStateRepository()
-            val saga = TestSaga(commandBus, eventBus, sagaStateRepository)
+            val saga = TestSaga(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository)
 
             val testCommandValue = Faker.instance().number().randomNumber()
             val command = TestCommand(testCommandValue)
@@ -35,8 +38,13 @@ class SagaTest : ShouldSpec(
         }
     }
 ) {
-    class TestSaga(commandBus: CommandBus, eventBus: EventBus, sagaStateRepository: SagaStateRepository) : Saga
-        (commandBus, eventBus, sagaStateRepository) {
+    class TestSaga(
+        commandBus: CommandBus,
+        eventBus: EventBus,
+        sagaAssociationRepository: SagaAssociationRepository,
+        sagaStateRepository: SagaStateRepository
+    ) : Saga
+        (commandBus, eventBus, sagaAssociationRepository, sagaStateRepository) {
 
         override fun name() = "test_saga"
 

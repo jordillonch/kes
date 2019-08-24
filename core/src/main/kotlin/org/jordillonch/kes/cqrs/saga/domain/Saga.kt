@@ -16,9 +16,10 @@ import kotlin.reflect.jvm.jvmErasure
 abstract class Saga(
     private val commandBus: CommandBus,
     private val eventBus: EventBus,
+    private val sagaAssociationRepository: SagaAssociationRepository,
     private val sagaStateRepository: SagaStateRepository
 ) {
-    private val id: UUID = UUID.randomUUID()
+    private val id = SagaId.new()
 
     init {
         registerCommandHandlers()
@@ -28,7 +29,7 @@ abstract class Saga(
     abstract fun name(): String
 
     fun associate(effectKClass: KClass<*>, associatedProperty: KProperty1<*, UUID>, associatedPropertyValue: UUID) {
-        sagaStateRepository.associate(id, name(), effectKClass, associatedProperty, associatedPropertyValue)
+        sagaAssociationRepository.associate(id, name(), effectKClass, associatedProperty, associatedPropertyValue)
     }
 
     private fun registerEventHandlers() {
@@ -52,7 +53,9 @@ abstract class Saga(
             // handler function
 
             // get saga state from repository
-            val state = sagaStateRepository.find(name(), command)
+            val state = sagaAssociationRepository
+                .find(name(), command)
+                ?.let { sagaStateRepository.find(it) }
             // set state to current saga
             state?.forEach { name, value ->
                 this.javaClass.getDeclaredField(name)
@@ -79,7 +82,9 @@ abstract class Saga(
             // handler function
 
             // get saga state from repository
-            val state = sagaStateRepository.find(name(), event)
+            val state = sagaAssociationRepository
+                .find(name(), event)
+                ?.let { sagaStateRepository.find(it) }
             // set state to current saga
             state?.forEach { name, value ->
                 this.javaClass.getDeclaredField(name)
