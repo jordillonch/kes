@@ -17,12 +17,15 @@ abstract class Saga(
     private val commandBus: CommandBus,
     private val eventBus: EventBus,
     private val sagaAssociationRepository: SagaAssociationRepository,
-    private val sagaStateRepository: SagaStateRepository,
-    registerHandlers: Boolean = true // FIXME: improve register once
+    private val sagaStateRepository: SagaStateRepository
 ) {
 
+    companion object {
+        private val handlersRegistered = mutableListOf<Triple<KClass<out Saga>, CommandBus, EventBus>>()
+    }
+
     init {
-        if (registerHandlers) registerHandlers()
+        registerHandlersOncePerSagaClassAndBuses()
     }
 
     val id = SagaId.new()
@@ -35,6 +38,12 @@ abstract class Saga(
         associatedPropertyValue: Any
     ) {
         sagaAssociationRepository.associate(id, name(), effectKClass, associatedProperty, associatedPropertyValue)
+    }
+
+    private fun registerHandlersOncePerSagaClassAndBuses() {
+        val kClassRegisteredForCommandAndEventBus = Triple(this.javaClass.kotlin, commandBus, eventBus)
+        if (!handlersRegistered.contains(kClassRegisteredForCommandAndEventBus)) registerHandlers()
+        handlersRegistered.add(kClassRegisteredForCommandAndEventBus)
     }
 
     private fun registerHandlers() {
@@ -64,7 +73,7 @@ abstract class Saga(
     private fun recoverSagaState(effect: Effect): Saga {
         val sagaInstance = this.javaClass.kotlin.constructors
             .first()
-            .call(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository, false)
+            .call(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository)
         sagaAssociationRepository
             .find(name(), effect)
             ?.let { sagaStateRepository.find(it) }

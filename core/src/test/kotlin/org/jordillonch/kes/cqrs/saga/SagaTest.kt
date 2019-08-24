@@ -116,10 +116,8 @@ class SagaTest : ShouldSpec(
         commandBus: CommandBus,
         eventBus: EventBus,
         sagaAssociationRepository: SagaAssociationRepository,
-        sagaStateRepository: SagaStateRepository,
-        registerHandlers: Boolean = true
-    ) :
-        Saga(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository, registerHandlers) {
+        sagaStateRepository: SagaStateRepository
+    ) : Saga(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository) {
 
         override fun name() = "test_association_saga"
 
