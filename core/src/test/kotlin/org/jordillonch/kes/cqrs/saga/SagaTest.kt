@@ -4,14 +4,12 @@ import io.kotlintest.specs.ShouldSpec
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.jordillonch.kes.cqrs.command.domain.Command
-import org.jordillonch.kes.cqrs.command.domain.CommandBus
 import org.jordillonch.kes.cqrs.command.infrastructure.SimpleCommandBus
 import org.jordillonch.kes.cqrs.event.domain.Event
-import org.jordillonch.kes.cqrs.event.domain.EventBus
 import org.jordillonch.kes.cqrs.event.infrastructure.SimpleEventBus
 import org.jordillonch.kes.cqrs.saga.domain.Saga
-import org.jordillonch.kes.cqrs.saga.domain.SagaAssociationRepository
-import org.jordillonch.kes.cqrs.saga.domain.SagaStateRepository
+import org.jordillonch.kes.cqrs.saga.domain.SagaId
+import org.jordillonch.kes.cqrs.saga.domain.SagaRegister
 import org.jordillonch.kes.cqrs.saga.infrastructure.InMemorySagaAssociationRepository
 import org.jordillonch.kes.cqrs.saga.infrastructure.InMemorySagaStateRepository
 import java.util.UUID
@@ -24,7 +22,8 @@ class SagaTest : ShouldSpec(
             val eventBus = SimpleEventBus()
             val sagaAssociationRepository = InMemorySagaAssociationRepository()
             val sagaStateRepository = InMemorySagaStateRepository()
-            TestSaga(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository)
+            val sagaRegister = SagaRegister(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository)
+            TestSaga(sagaRegister)
 
             TestSaga.testCommand1IdForAssert = null
             TestSaga.testCommand2IdForAssert = null
@@ -58,7 +57,8 @@ class SagaTest : ShouldSpec(
             val eventBus = SimpleEventBus()
             val sagaAssociationRepository = InMemorySagaAssociationRepository()
             val sagaStateRepository = InMemorySagaStateRepository()
-            TestSaga(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository)
+            val sagaRegister = SagaRegister(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository)
+            TestSaga(sagaRegister)
 
             TestSaga.testCommand1IdForAssert = null
             TestSaga.testCommand2IdForAssert = null
@@ -112,14 +112,14 @@ class SagaTest : ShouldSpec(
         }
     }
 ) {
-    class TestSaga(
-        commandBus: CommandBus,
-        eventBus: EventBus,
-        sagaAssociationRepository: SagaAssociationRepository,
-        sagaStateRepository: SagaStateRepository
-    ) : Saga(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository) {
+    class TestSaga(private val sagaRegister: SagaRegister) : Saga {
+        override val id = SagaId.new()
+        override fun name() = "test_saga"
+        override fun newInstance() = TestSaga(sagaRegister)
 
-        override fun name() = "test_association_saga"
+        init {
+            sagaRegister.init(this)
+        }
 
         var testCommand1Id: UUID? = null
         var testCommand2Id: UUID? = null
@@ -132,8 +132,8 @@ class SagaTest : ShouldSpec(
         }
 
         fun on(command: TestCommand) {
-            associate(TestCommand2::class, TestCommand2::testCommand2Id, command.testCommand2Id)
-            associate(TestEvent::class, TestEvent::associatedId, command.eventId)
+            sagaRegister.associate(this, TestCommand2::class, TestCommand2::testCommand2Id, command.testCommand2Id)
+            sagaRegister.associate(this, TestEvent::class, TestEvent::associatedId, command.eventId)
             testCommand1Id = command.id
             copyPropertiesToCompanionObjects()
         }
