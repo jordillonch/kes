@@ -1,7 +1,5 @@
 package org.jordillonch.kes.cqrs.query.domain
 
-import org.jordillonch.kes.cqrs.command.domain.Command
-
 interface Query
 
 interface QueryHandler<in Q : Query, R> {

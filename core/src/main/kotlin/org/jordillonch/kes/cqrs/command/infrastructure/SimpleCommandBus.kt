@@ -5,6 +5,7 @@ import org.jordillonch.kes.cqrs.command.domain.CommandBus
 import org.jordillonch.kes.cqrs.command.domain.CommandHandler
 import org.jordillonch.kes.cqrs.command.domain.NoCommandHandlerFoundException
 import kotlin.reflect.KFunction
+import kotlin.reflect.KType
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.jvmErasure
@@ -21,6 +22,11 @@ class SimpleCommandBus : CommandBus {
     override fun <C : Command> registerHandler(handler: (C) -> Unit) {
         @Suppress("UNCHECKED_CAST")
         handlers[classFrom(handler)] = handler as (Command) -> Unit
+    }
+
+    override fun <C : Command> registerHandler(command: Class<*>, handler: (C) -> Unit) {
+        @Suppress("UNCHECKED_CAST")
+        handlers[command.canonicalName] = handler as (Command) -> Unit
     }
 
     override fun handle(command: Command) {

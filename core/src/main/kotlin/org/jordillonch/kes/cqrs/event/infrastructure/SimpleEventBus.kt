@@ -5,6 +5,7 @@ import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus
 import org.jordillonch.kes.cqrs.event.domain.EventHandler
 import kotlin.reflect.KFunction
+import kotlin.reflect.KType
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.jvmErasure
@@ -16,7 +17,7 @@ class SimpleEventBus : EventBus {
     override fun <E : Event> registerHandler(handler: EventHandler<E>) {
         @Suppress("UNCHECKED_CAST")
         handlers.getOrPut(classFrom(handler)) { mutableListOf() }
-                .add { event: Event -> handler.on(event as E)}
+            .add { event: Event -> handler.on(event as E) }
     }
 
     override fun <E : Event> registerHandler(handler: (E) -> Unit) {
@@ -25,10 +26,16 @@ class SimpleEventBus : EventBus {
             .add(handler as (Event) -> Unit)
     }
 
+    override fun <E : Event> registerHandler(eventType: Class<*>, handler: (E) -> Unit) {
+        @Suppress("UNCHECKED_CAST")
+        handlers.getOrPut(eventType.canonicalName) { mutableListOf() }
+            .add(handler as (Event) -> Unit)
+    }
+
     override fun publish(event: Event) {
         @Suppress("UNCHECKED_CAST")
         handlers[event::class.qualifiedName]
-                ?.forEach { it.invoke(event) }
+            ?.forEach { it.invoke(event) }
     }
 
     override fun publish(events: List<Event>) {
@@ -39,12 +46,12 @@ class SimpleEventBus : EventBus {
         handler.reflect()!!.parameters.first().type.toString()
 
     private fun <E : Event> classFrom(handler: EventHandler<E>) =
-            handler.javaClass.kotlin
-                    .declaredFunctions
-                    .firstFunctionNamedOn()
-                    .mapParameterTypes()
-                    .first { it.isSubclassOf(Event::class) }
-                    .qualifiedName!!
+        handler.javaClass.kotlin
+            .declaredFunctions
+            .firstFunctionNamedOn()
+            .mapParameterTypes()
+            .first { it.isSubclassOf(Event::class) }
+            .qualifiedName!!
 
     private fun Collection<KFunction<*>>.firstFunctionNamedOn() = first { it.name == "on" }
 
