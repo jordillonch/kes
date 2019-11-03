@@ -35,40 +35,40 @@ class UoWTest : ShouldSpec(
 
             executionOrder shouldBe (1..5).toList()
         }
-    })
+    }) {
+    private class TestCommand : Command
 
-private class TestCommand : Command
+    private class TestCommandHandler(
+        private val eventBus: EventBus,
+        private val executionOrder: MutableList<Int>
+    ) : CommandHandler<TestCommand> {
 
-private class TestCommandHandler(
-    private val eventBus: EventBus,
-    private val executionOrder: MutableList<Int>
-) : CommandHandler<TestCommand> {
-
-    override fun on(command: TestCommand) {
-        executionOrder.add(1)
-        eventBus.publish(Test1Event())
-        executionOrder.add(2)
+        override fun on(command: TestCommand) {
+            executionOrder.add(1)
+            eventBus.publish(Test1Event())
+            executionOrder.add(2)
+        }
     }
-}
 
-private class Test1Event : Event
-private class Test2Event : Event
+    private class Test1Event : Event
+    private class Test2Event : Event
 
-private class Test1EventHandler(
-    private val eventBus: EventBus,
-    private val executionOrder: MutableList<Int>
-) : EventHandler<Test1Event> {
+    private class Test1EventHandler(
+        private val eventBus: EventBus,
+        private val executionOrder: MutableList<Int>
+    ) : EventHandler<Test1Event> {
 
-    override fun on(event: Test1Event) {
-        executionOrder.add(3)
-        eventBus.publish(Test2Event())
-        executionOrder.add(4)
+        override fun on(event: Test1Event) {
+            executionOrder.add(3)
+            eventBus.publish(Test2Event())
+            executionOrder.add(4)
+        }
     }
-}
 
-private class Test2EventHandler(private val executionOrder: MutableList<Int>) : EventHandler<Test2Event> {
+    private class Test2EventHandler(private val executionOrder: MutableList<Int>) : EventHandler<Test2Event> {
 
-    override fun on(event: Test2Event) {
-        executionOrder.add(5)
+        override fun on(event: Test2Event) {
+            executionOrder.add(5)
+        }
     }
 }
