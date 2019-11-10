@@ -21,6 +21,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
+    implementation("javax.transaction:javax.transaction-api:1.3")
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))
     testCompile("io.kotlintest:kotlintest-runner-junit5:3.1.10")
