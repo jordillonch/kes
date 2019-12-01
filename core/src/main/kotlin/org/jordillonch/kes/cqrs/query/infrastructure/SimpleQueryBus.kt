@@ -1,6 +1,5 @@
 package org.jordillonch.kes.cqrs.query.infrastructure
 
-import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.query.domain.NoQueryHandlerFoundException
 import org.jordillonch.kes.cqrs.query.domain.Query
 import org.jordillonch.kes.cqrs.query.domain.QueryBus
@@ -12,29 +11,29 @@ import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.reflect
 
 class SimpleQueryBus : QueryBus {
-    private val handlers: MutableMap<String, (Query) -> Any> = mutableMapOf()
+    private val handlers: MutableMap<String, (Query<Any>) -> Any> = mutableMapOf()
 
-    override fun <Q : Query> registerHandler(handler: QueryHandler<Q, *>) {
+    override fun <R, Q: Query<R>> registerHandler(handler: QueryHandler<R, Q>) {
         @Suppress("UNCHECKED_CAST")
-        handlers[classFrom(handler)] = { query: Query -> handler.on(query as Q)!! }
+        handlers[classFrom(handler)] = { query: Query<Any> -> handler.on(query as Q) as Any }
     }
 
-    override fun <Q : Query, R> registerHandler(handler: (Q) -> R) {
+    override fun <R, Q: Query<R>> registerHandler(handler: (Q) -> R) {
         @Suppress("UNCHECKED_CAST")
-        handlers[classFrom(handler)] = handler as (Query) -> Any
+        handlers[classFrom(handler)] = handler as (Query<Any>) -> Any
     }
 
-    override fun <R> ask(query: Query): R {
+    override fun <R> ask(query: Query<R>): R {
         @Suppress("UNCHECKED_CAST")
         return handlers[query::class.qualifiedName]
-                       ?.invoke(query) as R
+                       ?.invoke(query as Query<Any>) as R
                ?: throw NoQueryHandlerFoundException()
     }
 
-    private fun <Q : Query, R> classFrom(handler: (Q) -> R) =
+    private fun <R, Q: Query<R>> classFrom(handler: (Q) -> R) =
         handler.reflect()!!.parameters.first().type.toString()
 
-    private fun <Q : Query> classFrom(handler: QueryHandler<Q, *>) =
+    private fun <R, Q: Query<R>> classFrom(handler: QueryHandler<R, Q>) =
             handler.javaClass.kotlin
                     .declaredFunctions
                     .firstFunctionNamedOn()
