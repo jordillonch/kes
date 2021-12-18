@@ -1,9 +1,8 @@
 package org.jordillonch.kes.cqrs.query
 
-import io.kotlintest.shouldThrow
-import io.kotlintest.specs.ShouldSpec
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import org.jordillonch.kes.cqrs.query.domain.NoQueryHandlerFoundException
 import org.jordillonch.kes.cqrs.query.domain.Query
 import org.jordillonch.kes.cqrs.query.domain.QueryHandler
@@ -20,7 +19,7 @@ class SimpleQueryBusTest : ShouldSpec(
             val testValue = Faker.instance().number().randomNumber()
             val query = TestQuery(testValue)
 
-            assertThat(bus.ask(query), equalTo(testValue))
+            bus.ask<Long>(query) shouldBe testValue
         }
 
         should("register a lambda handler and then query it") {
@@ -31,7 +30,7 @@ class SimpleQueryBusTest : ShouldSpec(
             val testValue = Faker.instance().number().randomNumber()
             val query = TestQuery(testValue)
 
-            assertThat(bus.ask(query), equalTo(testValue))
+            bus.ask<Long>(query) shouldBe testValue
         }
 
         should("fail because no registered handler") {

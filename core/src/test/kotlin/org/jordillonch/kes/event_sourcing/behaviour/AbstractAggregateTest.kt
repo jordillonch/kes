@@ -1,12 +1,8 @@
 package org.jordillonch.kes.event_sourcing.behaviour
 
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.ShouldSpec
-import io.mockk.Runs
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
-import io.mockk.verify
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.*
 import org.jordillonch.kes.event_sourcing.domain.AggregateLifeCycle
 import org.jordillonch.kes.event_sourcing.domain.EventStore
 import org.jordillonch.kes.event_sourcing.stub.FooAggregate

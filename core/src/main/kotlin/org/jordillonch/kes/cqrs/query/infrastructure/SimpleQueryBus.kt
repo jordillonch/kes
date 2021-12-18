@@ -1,6 +1,5 @@
 package org.jordillonch.kes.cqrs.query.infrastructure
 
-import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.query.domain.NoQueryHandlerFoundException
 import org.jordillonch.kes.cqrs.query.domain.Query
 import org.jordillonch.kes.cqrs.query.domain.QueryBus
@@ -27,20 +26,20 @@ class SimpleQueryBus : QueryBus {
     override fun <R> ask(query: Query): R {
         @Suppress("UNCHECKED_CAST")
         return handlers[query::class.qualifiedName]
-                       ?.invoke(query) as R
-               ?: throw NoQueryHandlerFoundException()
+            ?.invoke(query) as R
+            ?: throw NoQueryHandlerFoundException()
     }
 
     private fun <Q : Query, R> classFrom(handler: (Q) -> R) =
         handler.reflect()!!.parameters.first().type.toString()
 
     private fun <Q : Query> classFrom(handler: QueryHandler<Q, *>) =
-            handler.javaClass.kotlin
-                    .declaredFunctions
-                    .firstFunctionNamedOn()
-                    .mapParameterTypes()
-                    .first { it.isSubclassOf(Query::class) }
-                    .qualifiedName!!
+        handler.javaClass.kotlin
+            .declaredFunctions
+            .firstFunctionNamedOn()
+            .mapParameterTypes()
+            .first { it.isSubclassOf(Query::class) }
+            .qualifiedName!!
 
     private fun Collection<KFunction<*>>.firstFunctionNamedOn() = first { it.name == "on" }
 

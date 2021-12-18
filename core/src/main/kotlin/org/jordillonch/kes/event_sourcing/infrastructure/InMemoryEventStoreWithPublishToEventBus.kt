@@ -3,8 +3,8 @@ package org.jordillonch.kes.event_sourcing.infrastructure
 import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus
 import org.jordillonch.kes.event_sourcing.domain.Aggregate
-import org.jordillonch.kes.event_sourcing.domain.AggregateId
 import org.jordillonch.kes.event_sourcing.domain.AggregateAlreadyExistsException
+import org.jordillonch.kes.event_sourcing.domain.AggregateId
 import org.jordillonch.kes.event_sourcing.domain.EventStore
 import java.util.concurrent.ConcurrentHashMap
 
@@ -18,7 +18,7 @@ class InMemoryEventStoreWithPublishToEventBus(private val eventBus: EventBus) : 
     override fun <A : Aggregate> load(factory: () -> A, id: AggregateId): A {
         val events = store[id]
         return factory()
-                .also { events!!.forEach { event -> it.process(event) } }
+            .also { events!!.forEach { event -> it.process(event) } }
     }
 
     override fun append(aggregate: Aggregate, eventSequence: Int, event: Event) {
@@ -30,9 +30,11 @@ class InMemoryEventStoreWithPublishToEventBus(private val eventBus: EventBus) : 
         eventBus.publish(event)
     }
 
-    private fun guardAggregateExists(eventSequence: Int,
-                                     eventsList: MutableList<Event>?,
-                                     aggregate: Aggregate) {
+    private fun guardAggregateExists(
+        eventSequence: Int,
+        eventsList: MutableList<Event>?,
+        aggregate: Aggregate
+    ) {
         if (eventSequence == 1 && eventsList != null)
             throw AggregateAlreadyExistsException.appendingFirstEvent(aggregate)
     }

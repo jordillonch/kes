@@ -5,7 +5,6 @@ import org.jordillonch.kes.cqrs.command.domain.CommandBus
 import org.jordillonch.kes.cqrs.command.domain.CommandHandler
 import org.jordillonch.kes.cqrs.command.domain.NoCommandHandlerFoundException
 import kotlin.reflect.KFunction
-import kotlin.reflect.KType
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.jvmErasure

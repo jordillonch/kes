@@ -1,11 +1,9 @@
 package org.jordillonch.kes.cqrs.event.infrastructure
 
-import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus
 import org.jordillonch.kes.cqrs.event.domain.EventHandler
 import kotlin.reflect.KFunction
-import kotlin.reflect.KType
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.jvmErasure

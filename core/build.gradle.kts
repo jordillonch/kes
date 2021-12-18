@@ -1,36 +1,32 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+val kotlin_version: String by project
 
 plugins {
-    kotlin("jvm") version "1.3.0"
-    java
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    kotlin("jvm") version "1.6.10"
 }
 
 group = "org.jordillonch.kes"
-version = "0.1-SNAPSHOT"
+version = "0.2.0"
+val kotestVersion = "5.0.2"
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://dl.bintray.com/kotlin/kotlinx") }
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
-    testImplementation(kotlin("test"))
-    testImplementation(kotlin("test-junit"))
-    testCompile("io.kotlintest:kotlintest-runner-junit5:3.1.10")
-    testImplementation("com.github.javafaker:javafaker:0.16")
-    testImplementation("io.mockk:mockk:1.8.10.kotlin13")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("com.github.javafaker:javafaker:1.0.2")
+    testImplementation("io.mockk:mockk:1.12.1")
 }
 
-val test by tasks.getting(Test::class) {
-    useJUnitPlatform { }
-    testLogging {
-        exceptionFormat = TestExceptionFormat.FULL
-    }
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
 }

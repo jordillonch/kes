@@ -1,9 +1,8 @@
 package org.jordillonch.kes.cqrs.command
 
-import io.kotlintest.shouldThrow
-import io.kotlintest.specs.ShouldSpec
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.command.domain.CommandHandler
 import org.jordillonch.kes.cqrs.command.domain.NoCommandHandlerFoundException
@@ -22,7 +21,7 @@ class SimpleCommandBusTest : ShouldSpec(
             val command = TestCommand(testValue)
 
             bus.handle(command)
-            assertThat(testValue, equalTo(handler.testValueToAssert))
+            handler.testValueToAssert shouldBe testValue
         }
 
         should("register a lambda handler and then handle it") {
@@ -35,7 +34,7 @@ class SimpleCommandBusTest : ShouldSpec(
             val command = TestCommand(testValue)
 
             bus.handle(command)
-            assertThat(testValue, equalTo(handleTestValue))
+            handleTestValue shouldBe testValue
         }
 
         should("register a lambda command-handler and then handle it") {
@@ -48,7 +47,7 @@ class SimpleCommandBusTest : ShouldSpec(
             val command = TestCommand(testValue)
 
             bus.handle(command)
-            assertThat(testValue, equalTo(handleTestValue))
+            handleTestValue shouldBe testValue
         }
 
         should("fail because no registered handler") {

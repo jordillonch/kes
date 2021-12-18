@@ -3,7 +3,7 @@ package org.jordillonch.kes.cqrs.saga.infrastructure
 import org.jordillonch.kes.cqrs.Effect
 import org.jordillonch.kes.cqrs.saga.domain.SagaAssociationRepository
 import org.jordillonch.kes.cqrs.saga.domain.SagaId
-import java.util.UUID
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
@@ -20,10 +20,10 @@ class InMemorySagaAssociationRepository : SagaAssociationRepository {
     ) {
         storeEffectClassToPropertyName[SagaEffect(sagaName, effectKClass)] = associatedProperty.name
         storeEffectPropertyValueToSagaId[
-            SagaEffectAssociationValue(
-                SagaEffect(sagaName, effectKClass),
-                associatedPropertyValue
-            )] = sagaId
+                SagaEffectAssociationValue(
+                    SagaEffect(sagaName, effectKClass),
+                    associatedPropertyValue
+                )] = sagaId
     }
 
     override fun find(sagaName: String, effect: Effect): SagaId? {

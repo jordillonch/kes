@@ -1,13 +1,9 @@
 package org.jordillonch.kes.event_sourcing.integration
 
-import io.kotlintest.matchers.types.shouldBeTypeOf
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.ShouldSpec
-import io.mockk.Runs
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
-import io.mockk.verify
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
+import io.mockk.*
 import org.jordillonch.kes.cqrs.event.domain.EventBus
 import org.jordillonch.kes.event_sourcing.domain.AggregateLifeCycle
 import org.jordillonch.kes.event_sourcing.infrastructure.InMemoryEventStoreWithPublishToEventBus

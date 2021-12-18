@@ -1,8 +1,7 @@
 package org.jordillonch.kes.cqrs.event
 
-import io.kotlintest.specs.ShouldSpec
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventHandler
 import org.jordillonch.kes.cqrs.event.infrastructure.SimpleEventBus
@@ -22,8 +21,8 @@ class SimpleEventBusTest : ShouldSpec(
             val event = TestEvent(testValue)
 
             bus.publish(event)
-            assertThat(testValue, equalTo(handler1.testValueToAssert))
-            assertThat(testValue, equalTo(handler2.testValueToAssert))
+            handler1.testValueToAssert shouldBe testValue
+            handler2.testValueToAssert shouldBe testValue
         }
 
         should("register a lambda handler and then send an event to it") {
@@ -38,8 +37,8 @@ class SimpleEventBusTest : ShouldSpec(
             val event = TestEvent(testValue)
 
             bus.publish(event)
-            assertThat(testValue, equalTo(handleTestValue1))
-            assertThat(testValue, equalTo(handleTestValue2))
+            handleTestValue1 shouldBe testValue
+            handleTestValue2 shouldBe testValue
         }
 
         should("not fail because no registered handler") {

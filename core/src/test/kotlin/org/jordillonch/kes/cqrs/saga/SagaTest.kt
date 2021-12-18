@@ -1,8 +1,7 @@
 package org.jordillonch.kes.cqrs.saga
 
-import io.kotlintest.specs.ShouldSpec
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.command.infrastructure.SimpleCommandBus
 import org.jordillonch.kes.cqrs.event.domain.Event
@@ -12,8 +11,7 @@ import org.jordillonch.kes.cqrs.saga.domain.SagaId
 import org.jordillonch.kes.cqrs.saga.domain.SagaRegister
 import org.jordillonch.kes.cqrs.saga.infrastructure.InMemorySagaAssociationRepository
 import org.jordillonch.kes.cqrs.saga.infrastructure.InMemorySagaStateRepository
-import java.util.UUID
-import kotlin.test.assertNull
+import java.util.*
 
 class SagaTest : ShouldSpec(
     {
@@ -37,19 +35,19 @@ class SagaTest : ShouldSpec(
             val event = TestEvent(testEventId)
 
             commandBus.handle(command1)
-            assertThat(TestSaga.testCommand1IdForAssert, equalTo(testCommandId))
-            assertNull(TestSaga.testCommand2IdForAssert)
-            assertNull(TestSaga.testEventIdForAssert)
+            TestSaga.testCommand1IdForAssert shouldBe testCommandId
+            TestSaga.testCommand2IdForAssert shouldBe null
+            TestSaga.testEventIdForAssert shouldBe null
 
             commandBus.handle(command2)
-            assertThat(TestSaga.testCommand1IdForAssert, equalTo(testCommandId))
-            assertThat(TestSaga.testCommand2IdForAssert, equalTo(testCommand2Id))
-            assertNull(TestSaga.testEventIdForAssert)
+            TestSaga.testCommand1IdForAssert shouldBe testCommandId
+            TestSaga.testCommand2IdForAssert shouldBe testCommand2Id
+            TestSaga.testEventIdForAssert shouldBe null
 
             eventBus.publish(event)
-            assertThat(TestSaga.testCommand1IdForAssert, equalTo(testCommandId))
-            assertThat(TestSaga.testCommand2IdForAssert, equalTo(testCommand2Id))
-            assertThat(TestSaga.testEventIdForAssert, equalTo(testEventId))
+            TestSaga.testCommand1IdForAssert shouldBe testCommandId
+            TestSaga.testCommand2IdForAssert shouldBe testCommand2Id
+            TestSaga.testEventIdForAssert shouldBe testEventId
         }
 
         should("handle two saga instances") {
@@ -79,36 +77,36 @@ class SagaTest : ShouldSpec(
             val saga2Event = TestEvent(saga2TestEventId)
 
             commandBus.handle(saga1Command1)
-            assertThat(TestSaga.testCommand1IdForAssert, equalTo(saga1TestCommandId))
-            assertNull(TestSaga.testCommand2IdForAssert)
-            assertNull(TestSaga.testEventIdForAssert)
+            TestSaga.testCommand1IdForAssert shouldBe saga1TestCommandId
+            TestSaga.testCommand2IdForAssert shouldBe null
+            TestSaga.testEventIdForAssert shouldBe null
 
             commandBus.handle(saga2Command1)
-            assertThat(TestSaga.testCommand1IdForAssert, equalTo(saga2TestCommandId))
-            assertNull(TestSaga.testCommand2IdForAssert)
-            assertNull(TestSaga.testEventIdForAssert)
+            TestSaga.testCommand1IdForAssert shouldBe saga2TestCommandId
+            TestSaga.testCommand2IdForAssert shouldBe null
+            TestSaga.testEventIdForAssert shouldBe null
 
 
             commandBus.handle(saga1Command2)
-            assertThat(TestSaga.testCommand1IdForAssert, equalTo(saga1TestCommandId))
-            assertThat(TestSaga.testCommand2IdForAssert, equalTo(saga1TestCommand2Id))
-            assertNull(TestSaga.testEventIdForAssert)
+            TestSaga.testCommand1IdForAssert shouldBe saga1TestCommandId
+            TestSaga.testCommand2IdForAssert shouldBe saga1TestCommand2Id
+            TestSaga.testEventIdForAssert shouldBe null
 
             commandBus.handle(saga2Command2)
-            assertThat(TestSaga.testCommand1IdForAssert, equalTo(saga2TestCommandId))
-            assertThat(TestSaga.testCommand2IdForAssert, equalTo(saga2TestCommand2Id))
-            assertNull(TestSaga.testEventIdForAssert)
+            TestSaga.testCommand1IdForAssert shouldBe saga2TestCommandId
+            TestSaga.testCommand2IdForAssert shouldBe saga2TestCommand2Id
+            TestSaga.testEventIdForAssert shouldBe null
 
 
             eventBus.publish(saga1Event)
-            assertThat(TestSaga.testCommand1IdForAssert, equalTo(saga1TestCommandId))
-            assertThat(TestSaga.testCommand2IdForAssert, equalTo(saga1TestCommand2Id))
-            assertThat(TestSaga.testEventIdForAssert, equalTo(saga1TestEventId))
+            TestSaga.testCommand1IdForAssert shouldBe saga1TestCommandId
+            TestSaga.testCommand2IdForAssert shouldBe saga1TestCommand2Id
+            TestSaga.testEventIdForAssert shouldBe saga1TestEventId
 
             eventBus.publish(saga2Event)
-            assertThat(TestSaga.testCommand1IdForAssert, equalTo(saga2TestCommandId))
-            assertThat(TestSaga.testCommand2IdForAssert, equalTo(saga2TestCommand2Id))
-            assertThat(TestSaga.testEventIdForAssert, equalTo(saga2TestEventId))
+            TestSaga.testCommand1IdForAssert shouldBe saga2TestCommandId
+            TestSaga.testCommand2IdForAssert shouldBe saga2TestCommand2Id
+            TestSaga.testEventIdForAssert shouldBe saga2TestEventId
         }
     }
 ) {

@@ -11,11 +11,11 @@ abstract class AbstractAggregate : Aggregate {
 
     override fun process(event: Event): Int {
         javaClass.kotlin.declaredFunctions
-                .first {
-                    it.name == "on" &&
-                    it.parameters[1].type.javaType == event.javaClass
-                }
-                .call(this, event)
+            .first {
+                it.name == "on" &&
+                        it.parameters[1].type.javaType == event.javaClass
+            }
+            .call(this, event)
 
         return currentEventSequence++
     }
