@@ -1,13 +1,12 @@
 package org.jordillonch.kes.cqrs.event.domain
 
 import org.jordillonch.kes.cqrs.Effect
+import org.jordillonch.kes.cqrs.command.domain.EffectHandler
 
 // TODO: add occurred on property
 interface Event : Effect
 
-interface EventHandler<in E : Event> {
-    fun on(event: E)
-}
+interface EventHandler<in E : Event>: EffectHandler
 
 interface EventBus {
     fun <E : Event> registerHandler(handler: EventHandler<E>)

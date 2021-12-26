@@ -13,9 +13,9 @@ class SimpleEventBus : EventBus {
     private val handlers: MutableMap<String, MutableList<(Event) -> Unit>> = mutableMapOf()
 
     override fun <E : Event> registerHandler(handler: EventHandler<E>) {
-        @Suppress("UNCHECKED_CAST")
-        handlers.getOrPut(classFrom(handler)) { mutableListOf() }
-            .add { event: Event -> handler.on(event as E) }
+//        @Suppress("UNCHECKED_CAST")
+//        handlers.getOrPut(classFrom(handler)) { mutableListOf() }
+//            .add { event: Event -> handler.on(event as E) }
     }
 
     override fun <E : Event> registerHandler(handler: (E) -> Unit) {

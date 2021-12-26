@@ -52,7 +52,8 @@ private data class TestEvent(val id: Long) : Event
 private class TestEventHandler : EventHandler<TestEvent> {
     var testValueToAssert: Long? = null
 
-    override fun on(event: TestEvent) {
+    fun on(event: TestEvent): List<Event> {
         testValueToAssert = event.id
+        return emptyList()
     }
 }

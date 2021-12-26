@@ -3,6 +3,7 @@ package org.jordillonch.kes.cqrs.command
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import org.jordillonch.kes.cqrs.Effect
 import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.command.domain.CommandHandler
 import org.jordillonch.kes.cqrs.command.domain.NoCommandHandlerFoundException
@@ -63,7 +64,8 @@ private data class TestCommand(val id: Long) : Command
 private class TestCommandHandler : CommandHandler<TestCommand> {
     var testValueToAssert: Long? = null
 
-    override fun on(command: TestCommand) {
+    fun on(command: TestCommand): List<Effect> {
         testValueToAssert = command.id
+        return emptyList()
     }
 }

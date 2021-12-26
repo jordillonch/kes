@@ -14,8 +14,8 @@ class SimpleCommandBus : CommandBus {
     private val handlers: MutableMap<String, (Command) -> Unit> = mutableMapOf()
 
     override fun <C : Command> registerHandler(handler: CommandHandler<C>) {
-        @Suppress("UNCHECKED_CAST")
-        handlers[classFrom(handler)] = { command: Command -> handler.on(command as C) }
+//        @Suppress("UNCHECKED_CAST")
+//        handlers[classFrom(handler)] = { command: Command -> handler.on(command as C) }
     }
 
     override fun <C : Command> registerHandler(handler: (C) -> Unit) {
@@ -32,7 +32,7 @@ class SimpleCommandBus : CommandBus {
         @Suppress("UNCHECKED_CAST")
         return handlers[command::class.qualifiedName]
             ?.invoke(command)
-            ?: throw NoCommandHandlerFoundException()
+            ?: throw NoCommandHandlerFoundException(command)
     }
 
     private fun <C : Command> classFrom(handler: (C) -> Unit) =

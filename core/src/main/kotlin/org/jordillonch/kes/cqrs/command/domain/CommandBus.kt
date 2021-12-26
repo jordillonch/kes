@@ -2,11 +2,9 @@ package org.jordillonch.kes.cqrs.command.domain
 
 import org.jordillonch.kes.cqrs.Effect
 
-interface Command : Effect
+//interface Command : Effect
 
-interface CommandHandler<in C : Command> {
-    fun on(command: C)
-}
+interface CommandHandler<in C : Command>: EffectHandler
 
 interface CommandBus {
     fun <C : Command> registerHandler(handler: CommandHandler<C>)
@@ -15,4 +13,4 @@ interface CommandBus {
     fun handle(command: Command)
 }
 
-class NoCommandHandlerFoundException : RuntimeException()
+class NoCommandHandlerFoundException(val command: Command) : RuntimeException()

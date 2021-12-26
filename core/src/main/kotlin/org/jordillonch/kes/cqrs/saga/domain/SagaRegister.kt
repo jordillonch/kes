@@ -91,6 +91,6 @@ class SagaRegister(
         sagaInstance.javaClass.kotlin.memberProperties
             .associateBy { it.name }
             .map { (k, v) -> k to v.also { it.isAccessible = true }.get(sagaInstance) }
-            .run { sagaStateRepository.save(sagaInstance.id, toMap() as Map<String, Any>) }
+            .run { sagaStateRepository.save(sagaInstance.id, toMap() as Map<String, SagaState>) }
     }
 }
