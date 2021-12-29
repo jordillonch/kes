@@ -4,10 +4,13 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import org.jordillonch.kes.cqrs.Effect
+import org.jordillonch.kes.cqrs.bus.domain.Associator
+import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationIdsRepositoryInMemory
+import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationTypesRepositoryInMemory
+import org.jordillonch.kes.cqrs.bus.infrastructure.BusSequential
 import org.jordillonch.kes.cqrs.command.domain.Command
 import org.jordillonch.kes.cqrs.command.domain.CommandHandler
 import org.jordillonch.kes.cqrs.command.domain.NoCommandHandlerFoundException
-import org.jordillonch.kes.cqrs.command.infrastructure.SimpleBus
 import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventHandler
 import org.jordillonch.kes.faker.Faker
@@ -15,7 +18,10 @@ import org.jordillonch.kes.faker.Faker
 class SimpleBusTest : ShouldSpec(
     {
         should("register some handlers and then handle them") {
-            val bus = SimpleBus()
+            val associationIdsRepository = AssociationIdsRepositoryInMemory()
+            val associationTypeRepository = AssociationTypesRepositoryInMemory()
+            val associator = Associator(associationIdsRepository, associationTypeRepository)
+            val bus = BusSequential(associator)
 
             val handler1 = ATestHandler()
             val handler2 = AnotherTestHandler()
@@ -40,7 +46,10 @@ class SimpleBusTest : ShouldSpec(
         }
 
         should("fail because no registered command handler") {
-            val bus = SimpleBus()
+            val associationIdsRepository = AssociationIdsRepositoryInMemory()
+            val associationTypeRepository = AssociationTypesRepositoryInMemory()
+            val associator = Associator(associationIdsRepository, associationTypeRepository)
+            val bus = BusSequential(associator)
             bus.push(ATestEvent(1))
             bus.drain()
             shouldThrow<NoCommandHandlerFoundException> {

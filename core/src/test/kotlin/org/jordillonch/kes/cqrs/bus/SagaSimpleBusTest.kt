@@ -1,52 +1,59 @@
-package org.jordillonch.kes.cqrs.saga
-
-//class SagaTest : ShouldSpec({
+//package org.jordillonch.kes.cqrs.bus
+//
+//import io.kotest.core.spec.style.ShouldSpec
+//import org.jordillonch.kes.cqrs.command.domain.Command
+//import org.jordillonch.kes.cqrs.bus.infrastructure.SimpleBus
+//import org.jordillonch.kes.cqrs.event.domain.Event
+//import org.jordillonch.kes.cqrs.saga.domain.Saga
+//import org.jordillonch.kes.cqrs.saga.domain.SagaState
+//import java.util.*
+//
+//class SagaSimpleBusTest : ShouldSpec({
 //    should("handle associated commands and events and recover saga state") {
-////        val commandBus = SimpleCommandBus()
-////        val eventBus = SimpleEventBus()
-////        val sagaAssociationRepository = InMemorySagaAssociationRepository()
-////        val sagaStateRepository = InMemorySagaStateRepository()
-//        val sagaRegister = SagaRegister(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository)
-////        val testSaga = TestSaga(sagaRegister)
 //        val bus = SimpleBus()
 //        bus.register(TestSaga::class)
 //
 //        val testCommandId = UUID.randomUUID()
 //        val testCommand2Id = UUID.randomUUID()
 //        val testEventId = UUID.randomUUID()
-//        val command1 = FirstTestCommand(testCommandId, testCommand2Id, testEventId)
+//        val startSagaCommand = StartSagaCommand(testCommandId, testCommand2Id, testEventId)
 //        val command2 = SecondCommand(testCommand2Id)
 //        val event = TestEvent(testEventId)
 //
-//        bus.handle(command1)
-//        sagaStateRepository.find(testSaga.id) shouldBe TestSagaState(testCommandId, null, null)
+//        bus.push(startSagaCommand)
+//        bus.drain()
+//        bus.findSagaState(TestSaga::class, startSagaCommand.id) shouldBe TestSagaState(testCommandId, null, null)
 //
-//        bus.handle(command2)
-//        sagaStateRepository.find(testSaga.id) shouldBe TestSagaState(testCommandId, testCommand2Id, null)
+//        bus.push(command2)
+//        bus.drain()
+//        bus.findSagaState(TestSaga::class, startSagaCommand.id) shouldBe TestSagaState(
+//            testCommandId,
+//            testCommand2Id,
+//            null
+//        )
 //
-//        bus.handle(event)
-//        sagaStateRepository.find(testSaga.id) shouldBe TestSagaState(testCommandId, testCommand2Id, testEventId)
+//        bus.push(event)
+//        bus.drain()
+//        bus.findSagaState(TestSaga::class, startSagaCommand.id) shouldBe TestSagaState(
+//            testCommandId,
+//            testCommand2Id,
+//            testEventId
+//        )
 //    }
 //
 //    should("handle two saga instances") {
-//        val commandBus = SimpleBus()
-//        val eventBus = SimpleEventBus()
-//        val sagaAssociationRepository = InMemorySagaAssociationRepository()
-//        val sagaStateRepository = InMemorySagaStateRepository()
-//        val sagaRegister = SagaRegister(commandBus, eventBus, sagaAssociationRepository, sagaStateRepository)
-//        val testSaga = TestSaga(sagaRegister)
 //
 //        val saga1TestCommandId = UUID.randomUUID()
 //        val saga1TestCommand2Id = UUID.randomUUID()
 //        val saga1TestEventId = UUID.randomUUID()
-//        val saga1Command1 = FirstTestCommand(saga1TestCommandId, saga1TestCommand2Id, saga1TestEventId)
+//        val saga1Command1 = StartSagaCommand(saga1TestCommandId, saga1TestCommand2Id, saga1TestEventId)
 //        val saga1Command2 = SecondCommand(saga1TestCommand2Id)
 //        val saga1Event = TestEvent(saga1TestEventId)
 //
 //        val saga2TestCommandId = UUID.randomUUID()
 //        val saga2TestCommand2Id = UUID.randomUUID()
 //        val saga2TestEventId = UUID.randomUUID()
-//        val saga2Command1 = FirstTestCommand(saga2TestCommandId, saga2TestCommand2Id, saga2TestEventId)
+//        val saga2Command1 = StartSagaCommand(saga2TestCommandId, saga2TestCommand2Id, saga2TestEventId)
 //        val saga2Command2 = SecondCommand(saga2TestCommand2Id)
 //        val saga2Event = TestEvent(saga2TestEventId)
 //
@@ -94,7 +101,7 @@ package org.jordillonch.kes.cqrs.saga
 //            sagaRegister.init(this)
 //        }
 //
-//        fun on(command: FirstTestCommand): SagaOutput {
+//        fun on(command: StartSagaCommand): SagaOutput {
 //            return SagaOutput(
 //                TestSagaState(command.id, null, null),
 //                listOf(
@@ -132,7 +139,7 @@ package org.jordillonch.kes.cqrs.saga
 //
 //    }
 //
-//    data class FirstTestCommand(val id: UUID, val testCommand2Id: UUID, val eventId: UUID) : Command
+//    data class StartSagaCommand(val id: UUID, val testCommand2Id: UUID, val eventId: UUID) : Command
 //    data class SecondCommand(val testCommand2Id: UUID) : Command
 //    data class TestEvent(val associatedId: UUID) : Event
 //    data class TestEventReceivedByEverybody(val id: UUID) : Event
