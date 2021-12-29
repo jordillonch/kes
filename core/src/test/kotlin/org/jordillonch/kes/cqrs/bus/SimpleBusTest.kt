@@ -3,12 +3,12 @@ package org.jordillonch.kes.cqrs.command
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import org.jordillonch.kes.cqrs.bus.domain.BusSequential
 import org.jordillonch.kes.cqrs.bus.domain.Command
 import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.bus.domain.association.Associator
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationIdsRepositoryInMemory
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationTypesRepositoryInMemory
+import org.jordillonch.kes.cqrs.bus.infrastructure.BusSequential
 import org.jordillonch.kes.cqrs.command.domain.CommandHandler
 import org.jordillonch.kes.cqrs.command.domain.NoCommandHandlerFoundException
 import org.jordillonch.kes.cqrs.event.domain.Event
