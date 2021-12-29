@@ -72,7 +72,7 @@ class AHandlerWithEntity : EntityHandler {
         return AHandlerWithEntity()
     }
 
-    fun firstStep(command: StartCommand): List<Effect> {
+    fun on(command: StartCommand): List<Effect> {
         val entity = FirstStepSomeEntity(command.id)
         return listOf(
             EntityCreated(entity),
@@ -82,25 +82,25 @@ class AHandlerWithEntity : EntityHandler {
         )
     }
 
-    fun middleStep(entity: FirstStepSomeEntity, command: SecondCommand): List<Effect> {
+    fun FirstStepSomeEntity.on(command: SecondCommand): List<Effect> {
         return listOf(
             // TODO: use some kind of "evolve"
-            EntityUpdated(SecondStepSomeEntity(entity.id)),
+            EntityUpdated(SecondStepSomeEntity(id)),
             MiddleStep1Processed()
         )
     }
 
-    fun middleStep(entity: SecondStepSomeEntity, command: SecondCommand): List<Effect> {
+    fun SecondStepSomeEntity.on(command: SecondCommand): List<Effect> {
         return listOf(
             // TODO: use some kind of "evolve"
-            EntityUpdated(FinalStepSomeEntity(entity.id)),
+            EntityUpdated(FinalStepSomeEntity(id)),
             MiddleStep2Processed()
         )
     }
 
-    fun finalStep(entity: FinalStepSomeEntity, event: FinishCommand): List<Effect> {
+    fun FinalStepSomeEntity.on(event: FinishCommand): List<Effect> {
         return listOf(
-            EntityDeleted(entity),
+            EntityDeleted(this),
             FinalStepProcessed()
         )
     }
