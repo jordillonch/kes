@@ -1,7 +1,6 @@
 package org.jordillonch.kes.cqrs.bus
 
 import io.kotest.core.spec.style.ShouldSpec
-import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import org.jordillonch.kes.cqrs.bus.domain.Command
 import org.jordillonch.kes.cqrs.bus.domain.Effect
@@ -10,14 +9,12 @@ import org.jordillonch.kes.cqrs.bus.domain.entity.*
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationIdsRepositoryInMemory
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationTypesRepositoryInMemory
 import org.jordillonch.kes.cqrs.bus.infrastructure.BusSequential
-import org.jordillonch.kes.cqrs.command.SimpleBusTest
 import org.jordillonch.kes.cqrs.event.domain.Event
-import org.jordillonch.kes.cqrs.event.domain.EventsHandler
 import org.jordillonch.kes.cqrs.saga.domain.Associate
 import java.util.*
 import kotlin.reflect.KClass
 
-class HandlersWithStateSimpleBusTest : ShouldSpec({
+class BusSequentialHandlersWithEntityTest : ShouldSpec({
     should("handle associated commands and events and recover saga state") {
         val associationIdsRepository = AssociationIdsRepositoryInMemory()
         val associationTypeRepository = AssociationTypesRepositoryInMemory()
@@ -129,18 +126,3 @@ class FirstStepProcessed : Event
 class MiddleStep1Processed : Event
 class MiddleStep2Processed : Event
 class FinalStepProcessed : Event
-
-class TestAssertionHandler : EventsHandler<SimpleBusTest.ATestEvent> {
-    private val events: MutableList<Event> = mutableListOf()
-
-    fun on(event: Event): List<Effect> {
-        events.add(event)
-        return emptyList()
-    }
-
-    fun getEvents(): List<Event> = events
-
-    infix fun shouldContainEvent(kClass: KClass<out Event>) {
-        getEvents().map { it.javaClass.kotlin } shouldContain kClass
-    }
-}
