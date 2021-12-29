@@ -3,7 +3,7 @@ package org.jordillonch.kes.cqrs.event
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import org.jordillonch.kes.cqrs.event.domain.Event
-import org.jordillonch.kes.cqrs.event.domain.EventHandler
+import org.jordillonch.kes.cqrs.event.domain.EventsHandler
 import org.jordillonch.kes.cqrs.event.infrastructure.SimpleEventBus
 import org.jordillonch.kes.faker.Faker
 
@@ -12,8 +12,8 @@ class SimpleEventBusTest : ShouldSpec(
         should("register a handler and then send an event to it") {
             val bus = SimpleEventBus()
 
-            val handler1 = TestEventHandler()
-            val handler2 = TestEventHandler()
+            val handler1 = TestEventsHandler()
+            val handler2 = TestEventsHandler()
             bus.registerHandler(handler1)
             bus.registerHandler(handler2)
 
@@ -49,7 +49,7 @@ class SimpleEventBusTest : ShouldSpec(
 
 private data class TestEvent(val id: Long) : Event
 
-private class TestEventHandler : EventHandler<TestEvent> {
+private class TestEventsHandler : EventsHandler<TestEvent> {
     var testValueToAssert: Long? = null
 
     fun on(event: TestEvent): List<Event> {

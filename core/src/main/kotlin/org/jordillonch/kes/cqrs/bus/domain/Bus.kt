@@ -1,19 +1,19 @@
-package org.jordillonch.kes.cqrs.command.domain
+package org.jordillonch.kes.cqrs.bus.domain
 
-import org.jordillonch.kes.cqrs.Effect
-
-interface Command : Effect
-interface Event : Effect
-
-interface EffectHandler
+import org.jordillonch.kes.cqrs.bus.domain.entity.EntityHandler
+import org.jordillonch.kes.cqrs.bus.domain.entity.Repository
+import kotlin.reflect.KClass
 
 interface Bus {
-    fun register(handler: EffectHandler)
+    fun register(handler: EffectsHandler)
+    fun <E, I> register(
+        handler: KClass<out EntityHandler>,
+        instanceCreator: () -> EntityHandler,
+        repository: Repository<E, I>
+    )
     fun push(effect: Effect)
     fun push(effects: List<Effect>)
     fun drain()
 }
 
-data class EntityCreated(val entity: Any): Event
-data class EntityUpdated(val entity: Any): Event
-data class EntityDeleted(val entity: Any): Event
+typealias Handler = (Effect) -> List<Effect>

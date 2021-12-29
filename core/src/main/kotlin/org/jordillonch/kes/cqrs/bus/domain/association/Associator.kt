@@ -1,7 +1,8 @@
-package org.jordillonch.kes.cqrs.bus.domain
+package org.jordillonch.kes.cqrs.bus.domain.association
 
-import org.jordillonch.kes.cqrs.Effect
-import org.jordillonch.kes.cqrs.command.domain.EffectHandler
+import org.jordillonch.kes.cqrs.bus.domain.Effect
+import org.jordillonch.kes.cqrs.bus.domain.EffectsHandler
+import org.jordillonch.kes.cqrs.bus.domain.entity.EntityHandler
 import org.jordillonch.kes.cqrs.saga.domain.Associate
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredMemberProperties
@@ -29,8 +30,8 @@ class Associator(
         return associationRepository.find(entityIdToFind)
     }
 
-    fun handler(): EffectHandler {
-        return object : EffectHandler {
+    fun handler(): EffectsHandler {
+        return object : EffectsHandler {
             fun on(effect: Associate): List<Effect> {
                 associate(effect)
                 return emptyList()

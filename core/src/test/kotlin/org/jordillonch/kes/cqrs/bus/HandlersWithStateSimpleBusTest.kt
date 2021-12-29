@@ -3,20 +3,16 @@ package org.jordillonch.kes.cqrs.bus
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
-import org.jordillonch.kes.cqrs.Effect
-import org.jordillonch.kes.cqrs.bus.domain.Associator
-import org.jordillonch.kes.cqrs.bus.domain.EntityHandler
-import org.jordillonch.kes.cqrs.bus.domain.Repository
+import org.jordillonch.kes.cqrs.bus.domain.BusSequential
+import org.jordillonch.kes.cqrs.bus.domain.Command
+import org.jordillonch.kes.cqrs.bus.domain.Effect
+import org.jordillonch.kes.cqrs.bus.domain.association.Associator
+import org.jordillonch.kes.cqrs.bus.domain.entity.*
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationIdsRepositoryInMemory
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationTypesRepositoryInMemory
-import org.jordillonch.kes.cqrs.bus.infrastructure.BusSequential
 import org.jordillonch.kes.cqrs.command.SimpleBusTest
-import org.jordillonch.kes.cqrs.command.domain.Command
-import org.jordillonch.kes.cqrs.command.domain.EntityCreated
-import org.jordillonch.kes.cqrs.command.domain.EntityDeleted
-import org.jordillonch.kes.cqrs.command.domain.EntityUpdated
 import org.jordillonch.kes.cqrs.event.domain.Event
-import org.jordillonch.kes.cqrs.event.domain.EventHandler
+import org.jordillonch.kes.cqrs.event.domain.EventsHandler
 import org.jordillonch.kes.cqrs.saga.domain.Associate
 import java.util.*
 import kotlin.reflect.KClass
@@ -134,7 +130,7 @@ class MiddleStep1Processed : Event
 class MiddleStep2Processed : Event
 class FinalStepProcessed : Event
 
-class TestAssertionHandler : EventHandler<SimpleBusTest.ATestEvent> {
+class TestAssertionHandler : EventsHandler<SimpleBusTest.ATestEvent> {
     private val events: MutableList<Event> = mutableListOf()
 
     fun on(event: Event): List<Effect> {

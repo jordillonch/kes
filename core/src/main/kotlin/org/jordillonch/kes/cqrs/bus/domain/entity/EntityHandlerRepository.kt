@@ -1,14 +1,12 @@
-package org.jordillonch.kes.cqrs.bus.domain
+package org.jordillonch.kes.cqrs.bus.domain.entity
 
-import org.jordillonch.kes.cqrs.Effect
-import org.jordillonch.kes.cqrs.command.domain.EffectHandler
-import org.jordillonch.kes.cqrs.command.domain.EntityCreated
-import org.jordillonch.kes.cqrs.command.domain.EntityDeleted
-import org.jordillonch.kes.cqrs.command.domain.EntityUpdated
+import org.jordillonch.kes.cqrs.bus.domain.Effect
+import org.jordillonch.kes.cqrs.bus.domain.EffectsHandler
+import org.jordillonch.kes.cqrs.bus.domain.Event
 import kotlin.reflect.KClass
 
-class EntityHandlerRepository : EffectHandler {
-    val repositories: MutableMap<KClass<*>, Repository<Any, Any>> = mutableMapOf()
+class EntityHandlerRepository : EffectsHandler {
+    private val repositories: MutableMap<KClass<*>, Repository<Any, Any>> = mutableMapOf()
 
     fun <E, I> register(repository: Repository<E, I>, entityType: KClass<*>) {
         @Suppress("UNCHECKED_CAST")
@@ -40,3 +38,7 @@ class EntityHandlerRepository : EffectHandler {
         repositories[entity.javaClass.kotlin]
             ?: throw IllegalStateException("No repository registered for ${entity.javaClass.kotlin}")
 }
+
+data class EntityCreated(val entity: Any): Event
+data class EntityDeleted(val entity: Any): Event
+data class EntityUpdated(val entity: Any): Event

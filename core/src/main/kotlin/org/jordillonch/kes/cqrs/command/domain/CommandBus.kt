@@ -1,10 +1,11 @@
 package org.jordillonch.kes.cqrs.command.domain
 
-import org.jordillonch.kes.cqrs.Effect
+import org.jordillonch.kes.cqrs.bus.domain.Command
+import org.jordillonch.kes.cqrs.bus.domain.EffectsHandler
 
 //interface Command : Effect
 
-interface CommandHandler<in C : Command>: EffectHandler
+interface CommandHandler<in C : Command>: EffectsHandler
 
 interface CommandBus {
     fun <C : Command> registerHandler(handler: CommandHandler<C>)

@@ -1,7 +1,7 @@
 package org.jordillonch.kes.cqrs.saga.domain
 
-import org.jordillonch.kes.cqrs.Effect
-import org.jordillonch.kes.cqrs.command.domain.Command
+import org.jordillonch.kes.cqrs.bus.domain.Command
+import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.command.domain.CommandBus
 import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus

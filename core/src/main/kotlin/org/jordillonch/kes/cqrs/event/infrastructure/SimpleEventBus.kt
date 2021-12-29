@@ -2,7 +2,7 @@ package org.jordillonch.kes.cqrs.event.infrastructure
 
 import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus
-import org.jordillonch.kes.cqrs.event.domain.EventHandler
+import org.jordillonch.kes.cqrs.event.domain.EventsHandler
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.isSubclassOf
@@ -12,13 +12,13 @@ import kotlin.reflect.jvm.reflect
 class SimpleEventBus : EventBus {
     private val handlers: MutableMap<String, MutableList<(Event) -> Unit>> = mutableMapOf()
 
-    override fun <E : Event> registerHandler(handler: EventHandler<E>) {
+    override fun <E : Event> registerHandler(handler: EventsHandler<E>) {
 //        @Suppress("UNCHECKED_CAST")
 //        handlers.getOrPut(classFrom(handler)) { mutableListOf() }
 //            .add { event: Event -> handler.on(event as E) }
     }
 
-    override fun <E : Event> registerHandler(handler: (E) -> Unit) {
+    fun <E : Event> registerHandler(handler: (E) -> Unit) {
         @Suppress("UNCHECKED_CAST")
         handlers.getOrPut(classFrom(handler)) { mutableListOf() }
             .add(handler as (Event) -> Unit)
@@ -43,7 +43,7 @@ class SimpleEventBus : EventBus {
     private fun <E : Event> classFrom(handler: (E) -> Unit) =
         handler.reflect()!!.parameters.first().type.toString()
 
-    private fun <E : Event> classFrom(handler: EventHandler<E>) =
+    private fun <E : Event> classFrom(handler: EventsHandler<E>) =
         handler.javaClass.kotlin
             .declaredFunctions
             .firstFunctionNamedOn()

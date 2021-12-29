@@ -1,6 +1,6 @@
 package org.jordillonch.kes.cqrs.saga.infrastructure
 
-import org.jordillonch.kes.cqrs.Effect
+import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.saga.domain.SagaAssociationRepository
 import org.jordillonch.kes.cqrs.saga.domain.SagaId
 import java.util.*

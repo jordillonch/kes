@@ -1,6 +1,6 @@
 package org.jordillonch.kes.cqrs.saga.domain
 
-import org.jordillonch.kes.cqrs.Effect
+import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.event.domain.Event
 import kotlin.reflect.KProperty1
 

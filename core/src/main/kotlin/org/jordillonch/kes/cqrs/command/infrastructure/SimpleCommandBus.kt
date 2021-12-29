@@ -1,6 +1,6 @@
 package org.jordillonch.kes.cqrs.command.infrastructure
 
-import org.jordillonch.kes.cqrs.command.domain.Command
+import org.jordillonch.kes.cqrs.bus.domain.Command
 import org.jordillonch.kes.cqrs.command.domain.CommandBus
 import org.jordillonch.kes.cqrs.command.domain.CommandHandler
 import org.jordillonch.kes.cqrs.command.domain.NoCommandHandlerFoundException

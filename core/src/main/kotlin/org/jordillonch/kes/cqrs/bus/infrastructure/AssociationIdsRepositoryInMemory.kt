@@ -1,6 +1,6 @@
 package org.jordillonch.kes.cqrs.bus.infrastructure
 
-import org.jordillonch.kes.cqrs.bus.domain.AssociationIdsRepository
+import org.jordillonch.kes.cqrs.bus.domain.association.AssociationIdsRepository
 
 class AssociationIdsRepositoryInMemory : AssociationIdsRepository {
     private val associations = mutableMapOf<Any, MutableList<Any>>()

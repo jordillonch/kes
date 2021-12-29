@@ -1,7 +1,7 @@
 //package org.jordillonch.kes.cqrs.bus
 //
 //import io.kotest.core.spec.style.ShouldSpec
-//import org.jordillonch.kes.cqrs.command.domain.Command
+//import org.jordillonch.kes.cqrs.bus.domain.Command
 //import org.jordillonch.kes.cqrs.bus.infrastructure.SimpleBus
 //import org.jordillonch.kes.cqrs.event.domain.Event
 //import org.jordillonch.kes.cqrs.saga.domain.Saga

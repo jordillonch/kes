@@ -2,19 +2,18 @@ package org.jordillonch.kes.cqrs.event.infrastructure
 
 import org.jordillonch.kes.cqrs.event.domain.Event
 import org.jordillonch.kes.cqrs.event.domain.EventBus
-import org.jordillonch.kes.cqrs.event.domain.EventHandler
+import org.jordillonch.kes.cqrs.event.domain.EventsHandler
 import java.util.concurrent.Executors
-import kotlin.reflect.KType
 
 class AsyncSimpleEventBus(poolSize: Int = 4) : EventBus {
     private val simpleEventBus = SimpleEventBus()
     private val executor = Executors.newFixedThreadPool(poolSize)
 
-    override fun <C : Event> registerHandler(handler: EventHandler<C>) {
+    override fun <C : Event> registerHandler(handler: EventsHandler<C>) {
         simpleEventBus.registerHandler(handler)
     }
 
-    override fun <E : Event> registerHandler(handler: (E) -> Unit) {
+    fun <E : Event> registerHandler(handler: (E) -> Unit) {
         simpleEventBus.registerHandler(handler)
     }
 

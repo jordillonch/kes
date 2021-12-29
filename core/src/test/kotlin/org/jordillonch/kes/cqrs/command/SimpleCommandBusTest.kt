@@ -3,8 +3,8 @@ package org.jordillonch.kes.cqrs.command
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import org.jordillonch.kes.cqrs.Effect
-import org.jordillonch.kes.cqrs.command.domain.Command
+import org.jordillonch.kes.cqrs.bus.domain.Command
+import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.command.domain.CommandHandler
 import org.jordillonch.kes.cqrs.command.domain.NoCommandHandlerFoundException
 import org.jordillonch.kes.cqrs.command.infrastructure.SimpleCommandBus

@@ -1,4 +1,4 @@
-package org.jordillonch.kes.cqrs.bus.domain
+package org.jordillonch.kes.cqrs.bus.domain.entity
 
 import kotlin.reflect.KClass
 

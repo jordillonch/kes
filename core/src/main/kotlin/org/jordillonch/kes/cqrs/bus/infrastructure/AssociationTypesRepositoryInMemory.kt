@@ -1,6 +1,6 @@
 package org.jordillonch.kes.cqrs.bus.infrastructure
 
-import org.jordillonch.kes.cqrs.bus.domain.AssociationTypesRepository
+import org.jordillonch.kes.cqrs.bus.domain.association.AssociationTypesRepository
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 

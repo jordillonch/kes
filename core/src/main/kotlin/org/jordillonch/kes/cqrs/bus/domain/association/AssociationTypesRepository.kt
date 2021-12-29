@@ -1,4 +1,4 @@
-package org.jordillonch.kes.cqrs.bus.domain
+package org.jordillonch.kes.cqrs.bus.domain.association
 
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
