@@ -99,7 +99,7 @@ abstract class Bus(
                     .entityIdsFor(handler, effect)
                     .map { entityId ->
                         val entity = repository?.find(entityId as I) ?: genericRepository.find(entityId)
-                        if (entityFunctionParameterMatchesEntityType(entity!!, function)) {
+                        if (entityFunctionParameterTypeMatchesEntityType(entity!!, function)) {
                             function.call(handlerInstance(), entity, effect) as List<Effect>
                         } else {
                             emptyList()
@@ -113,7 +113,7 @@ abstract class Bus(
     private fun functionsWithEffectParameter(function: KFunction<*>) =
         function.parameters.any { it.type.jvmErasure.isSubclassOf(Effect::class) }
 
-    private fun entityFunctionParameterMatchesEntityType(entity: Any, function: KFunction<*>) =
+    private fun entityFunctionParameterTypeMatchesEntityType(entity: Any, function: KFunction<*>) =
         entity::class == function.parameters[1].type.jvmErasure
 }
 
