@@ -14,6 +14,3 @@ interface EntityTypedRepository<E, I> : Repository<E, I> {
 
 interface GenericRepository : Repository<IdentifiedEntity, Any>
 
-interface IdentifiedEntity {
-    fun primaryId(): Any
-}

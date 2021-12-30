@@ -6,6 +6,7 @@ import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.bus.domain.association.Associate
 import org.jordillonch.kes.cqrs.bus.domain.association.Associator
 import org.jordillonch.kes.cqrs.bus.domain.entity.IdentifiedEntity
+import org.jordillonch.kes.cqrs.bus.domain.entity.evolveTo
 import org.jordillonch.kes.cqrs.bus.domain.saga.SagaStateCreated
 import org.jordillonch.kes.cqrs.bus.domain.saga.SagaStateDeleted
 import org.jordillonch.kes.cqrs.bus.domain.saga.SagaStateUpdated
@@ -53,7 +54,7 @@ class BusSequentialSagaTest : ShouldSpec({
     }
 })
 
-sealed class TestSagaState(private val id_: UUID): IdentifiedEntity {
+sealed class TestSagaState(private val id_: UUID) : IdentifiedEntity {
     override fun primaryId(): Any = id_
 }
 
@@ -75,16 +76,14 @@ class TestSaga {
 
     fun FirstStepSagaState.on(command: SecondCommand): List<Effect> {
         return listOf(
-            // TODO: use some kind of "evolve"
-            SagaStateUpdated(SecondStepSagaState(id)),
+            SagaStateUpdated(evolveTo(::SecondStepSagaState)),
             MiddleStep1Processed()
         )
     }
 
     fun SecondStepSagaState.on(command: SecondCommand): List<Effect> {
         return listOf(
-            // TODO: use some kind of "evolve"
-            SagaStateUpdated(FinalStepSagaState(id)),
+            SagaStateUpdated(evolveTo(::FinalStepSagaState)),
             MiddleStep2Processed()
         )
     }

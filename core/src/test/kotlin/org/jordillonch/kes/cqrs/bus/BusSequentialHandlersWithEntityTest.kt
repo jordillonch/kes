@@ -7,10 +7,7 @@ import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.bus.domain.Event
 import org.jordillonch.kes.cqrs.bus.domain.association.Associate
 import org.jordillonch.kes.cqrs.bus.domain.association.Associator
-import org.jordillonch.kes.cqrs.bus.domain.entity.EntityCreated
-import org.jordillonch.kes.cqrs.bus.domain.entity.EntityDeleted
-import org.jordillonch.kes.cqrs.bus.domain.entity.EntityTypedRepository
-import org.jordillonch.kes.cqrs.bus.domain.entity.EntityUpdated
+import org.jordillonch.kes.cqrs.bus.domain.entity.*
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationIdsRepositoryInMemory
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationTypesRepositoryInMemory
 import org.jordillonch.kes.cqrs.bus.infrastructure.BusSequential
@@ -77,16 +74,14 @@ class AHandlerWithEntity {
 
     fun FirstStepSomeEntity.on(command: SecondCommand): List<Effect> {
         return listOf(
-            // TODO: use some kind of "evolve"
-            EntityUpdated(SecondStepSomeEntity(id)),
+            EntityUpdated(evolveTo(::SecondStepSomeEntity)),
             MiddleStep1Processed()
         )
     }
 
     fun SecondStepSomeEntity.on(command: SecondCommand): List<Effect> {
         return listOf(
-            // TODO: use some kind of "evolve"
-            EntityUpdated(FinalStepSomeEntity(id)),
+            EntityUpdated(evolveTo(::FinalStepSomeEntity)),
             MiddleStep2Processed()
         )
     }
