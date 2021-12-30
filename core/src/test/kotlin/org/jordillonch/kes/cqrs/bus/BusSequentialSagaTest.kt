@@ -63,11 +63,11 @@ data class FinalStepSagaState(val id: UUID) : TestSagaState(id)
 
 class TestSaga {
     fun on(command: StartCommand): List<Effect> {
-        val entity = FirstStepSagaState(command.id)
+        val state = FirstStepSagaState(command.id)
         return listOf(
-            SagaStateCreated(entity),
-            Associate(this, entity.id, SecondCommand::otherId, command.otherId),
-            Associate(this, entity.id, FinishCommand::id, command.id),
+            SagaStateCreated(state),
+            Associate(this, state.id, SecondCommand::otherId, command.otherId),
+            Associate(this, state.id, FinishCommand::id, command.id),
             FirstStepProcessed()
         )
     }
