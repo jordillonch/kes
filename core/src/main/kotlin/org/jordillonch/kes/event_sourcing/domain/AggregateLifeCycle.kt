@@ -1,6 +1,6 @@
 package org.jordillonch.kes.event_sourcing.domain
 
-import org.jordillonch.kes.cqrs.event.domain.Event
+import org.jordillonch.kes.cqrs.bus.domain.Event
 
 object AggregateLifeCycle {
     private lateinit var eventStore: EventStore

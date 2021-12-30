@@ -3,7 +3,6 @@ package org.jordillonch.kes.cqrs.bus.domain.association
 import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.bus.domain.EffectsHandler
 import org.jordillonch.kes.cqrs.bus.domain.entity.EntityHandler
-import org.jordillonch.kes.cqrs.saga.domain.Associate
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField

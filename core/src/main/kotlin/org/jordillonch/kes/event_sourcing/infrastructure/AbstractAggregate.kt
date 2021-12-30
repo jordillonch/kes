@@ -1,6 +1,6 @@
 package org.jordillonch.kes.event_sourcing.infrastructure
 
-import org.jordillonch.kes.cqrs.event.domain.Event
+import org.jordillonch.kes.cqrs.bus.domain.Event
 import org.jordillonch.kes.event_sourcing.domain.Aggregate
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.javaType

@@ -1,6 +1,7 @@
 package org.jordillonch.kes.event_sourcing.domain
 
-import org.jordillonch.kes.cqrs.event.domain.Event
+import org.jordillonch.kes.cqrs.bus.domain.Event
+
 
 interface EventStore {
     fun <A : Aggregate> load(factory: () -> A, id: AggregateId): A

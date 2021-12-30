@@ -3,7 +3,8 @@ package org.jordillonch.kes.cqrs.bus.domain
 import org.jordillonch.kes.cqrs.bus.domain.association.Associator
 import org.jordillonch.kes.cqrs.bus.domain.entity.EntityHandler
 import org.jordillonch.kes.cqrs.bus.domain.entity.EntityHandlerRepository
-import org.jordillonch.kes.cqrs.bus.domain.entity.Repository
+import org.jordillonch.kes.cqrs.bus.domain.entity.EntityTypedRepository
+import org.jordillonch.kes.cqrs.bus.domain.entity.GenericRepository
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
@@ -12,10 +13,13 @@ import kotlin.reflect.jvm.jvmErasure
 
 typealias Handler = (Effect) -> List<Effect>
 
-abstract class Bus(private val associator: Associator) {
+abstract class Bus(
+    private val associator: Associator,
+    private val genericRepository: GenericRepository
+) {
     private val handlers: MutableMap<String, MutableList<Handler>> = mutableMapOf()
     private val queue: ArrayDeque<Effect> = ArrayDeque()
-    private val entityHandlerRepository = EntityHandlerRepository()
+    private val entityHandlerRepository = EntityHandlerRepository(genericRepository)
 
     init {
         register(entityHandlerRepository)
@@ -36,21 +40,15 @@ abstract class Bus(private val associator: Associator) {
             .forEach { function -> registerHandler(handler, function) }
     }
 
-    fun <E, I> register(
-        handler: KClass<out EntityHandler>,
-        instanceCreator: () -> EntityHandler,
-        repository: Repository<E, I>
-    ) {
+    fun <E, I> register(instanceHandler: () -> EntityHandler, repository: EntityTypedRepository<E, I>?) {
+        val handler = instanceHandler().javaClass.kotlin
         handler.declaredFunctions
             .filter { function -> functionsWithEffectParameter(function) }
-            .forEach { function ->
-                registerHandlerWithEntity(
-                    handler,
-                    function,
-                    instanceCreator,
-                    repository
-                )
-            }
+            .forEach { function -> registerHandlerWithEntity(handler, instanceHandler, function, repository) }
+    }
+
+    fun register(instanceHandler: () -> EntityHandler) {
+        register<Any, Any>(instanceHandler, null)
     }
 
     fun push(effect: Effect) = queue.add(effect).let { }
@@ -67,35 +65,30 @@ abstract class Bus(private val associator: Associator) {
 
     private fun <E, I> registerHandlerWithEntity(
         handler: KClass<out EntityHandler>,
+        handlerInstance: () -> EntityHandler,
         function: KFunction<*>,
-        entityInstanceCreator: () -> EntityHandler,
-        repository: Repository<E, I>?
+        repository: EntityTypedRepository<E, I>?
     ) {
-        if (function.parameters.size == 2) {
-            registerHandlerWithEntityConstructor(function, entityInstanceCreator)
-        } else if (function.parameters.size == 3 && repository != null) {
-            registerHandlerWithEntityFromRepository(function, handler, repository, entityInstanceCreator)
-        } else {
-            throw IllegalArgumentException("Invalid handler function")
+        when (function.parameters.size) {
+            2 -> registerHandlerWithEntityConstructor(handlerInstance, function)
+            3 -> registerHandlerWithEntityFromRepository(handlerInstance, handler, function, repository)
+            else -> throw IllegalArgumentException("Invalid handler function")
         }
     }
 
-    private fun registerHandlerWithEntityConstructor(
-        function: KFunction<*>,
-        entityInstanceCreator: () -> EntityHandler
-    ) {
+    private fun registerHandlerWithEntityConstructor(handlerInstance: () -> EntityHandler, function: KFunction<*>) {
         val effectType = function.parameters[1].type.jvmErasure
         @Suppress("UNCHECKED_CAST")
         handlers
             .getOrPut(effectType.java.canonicalName) { mutableListOf() }
-            .add { effect: Effect -> function.call(entityInstanceCreator(), effect) as List<Effect> }
+            .add { effect: Effect -> function.call(handlerInstance(), effect) as List<Effect> }
     }
 
     private fun <E, I> registerHandlerWithEntityFromRepository(
-        function: KFunction<*>,
+        handlerInstance: () -> EntityHandler,
         handler: KClass<out EntityHandler>,
-        repository: Repository<E, I>,
-        entityInstanceCreator: () -> EntityHandler
+        function: KFunction<*>,
+        repository: EntityTypedRepository<E, I>?
     ) {
         val effectType = function.parameters[2].type.jvmErasure
         @Suppress("UNCHECKED_CAST")
@@ -105,21 +98,23 @@ abstract class Bus(private val associator: Associator) {
                 associator
                     .entityIdsFor(handler, effect)
                     .map { entityId ->
-                        val entity = repository.find(entityId as I)
-                        if (entityFunctionParameterMatchesEntityType<E>(entity, function)) {
-                            function.call(entityInstanceCreator(), entity, effect) as List<Effect>
+                        val entity = repository?.find(entityId as I) ?: genericRepository.find(entityId)
+                        if (entityFunctionParameterMatchesEntityType(entity!!, function)) {
+                            function.call(handlerInstance(), entity, effect) as List<Effect>
                         } else {
                             emptyList()
                         }
                     }
                     .flatten()
             }
-        entityHandlerRepository.register(repository, repository.entityType())
+        if (repository != null) entityHandlerRepository.register(repository, repository.entityType())
     }
 
     private fun functionsWithEffectParameter(function: KFunction<*>) =
         function.parameters.any { it.type.jvmErasure.isSubclassOf(Effect::class) }
 
-    private fun <E> entityFunctionParameterMatchesEntityType(entity: E?, function: KFunction<*>) =
-        entity!!::class == function.parameters[1].type.jvmErasure
+    private fun entityFunctionParameterMatchesEntityType(entity: Any, function: KFunction<*>) =
+        entity::class == function.parameters[1].type.jvmErasure
 }
+
+class NoCommandHandlerFoundException(val command: Command) : RuntimeException()

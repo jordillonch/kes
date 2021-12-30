@@ -1,15 +1,12 @@
 package org.jordillonch.kes.cqrs.bus.infrastructure
 
-import org.jordillonch.kes.cqrs.bus.domain.Bus
-import org.jordillonch.kes.cqrs.bus.domain.Command
-import org.jordillonch.kes.cqrs.bus.domain.Effect
-import org.jordillonch.kes.cqrs.bus.domain.Handler
+import org.jordillonch.kes.cqrs.bus.domain.*
 import org.jordillonch.kes.cqrs.bus.domain.association.Associator
-import org.jordillonch.kes.cqrs.command.domain.NoCommandHandlerFoundException
+import org.jordillonch.kes.cqrs.bus.domain.entity.GenericRepository
 import kotlin.reflect.full.allSuperclasses
 import kotlin.reflect.full.isSubclassOf
 
-class BusSequential(associator: Associator) : Bus(associator) {
+class BusSequential(associator: Associator, genericRepository: GenericRepository) : Bus(associator, genericRepository) {
     override fun drain() {
         while (!isQueueEmpty()) {
             val effect = removeFirstQueueElement()
