@@ -1,7 +1,6 @@
 package org.jordillonch.kes.cqrs.bus.domain.association
 
 import org.jordillonch.kes.cqrs.bus.domain.Effect
-import org.jordillonch.kes.cqrs.bus.domain.entity.EntityHandler
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
@@ -20,7 +19,7 @@ class Associator(
         )
     }
 
-    fun entityIdsFor(handler: KClass<out EntityHandler>, associatedType: Any): List<Any> {
+    fun entityIdsFor(handler: KClass<out Any>, associatedType: Any): List<Any> {
         val associatedFieldName = associationTypesRepository.find(handler, associatedType.javaClass.kotlin).name
         val entityIdToFind = associatedType.javaClass.kotlin.declaredMemberProperties
             .find { it.name == associatedFieldName }!!

@@ -1,7 +1,6 @@
 package org.jordillonch.kes.cqrs.bus.domain
 
 import org.jordillonch.kes.cqrs.bus.domain.association.Associator
-import org.jordillonch.kes.cqrs.bus.domain.entity.EntityHandler
 import org.jordillonch.kes.cqrs.bus.domain.entity.EntityHandlerRepository
 import org.jordillonch.kes.cqrs.bus.domain.entity.EntityTypedRepository
 import org.jordillonch.kes.cqrs.bus.domain.entity.GenericRepository
@@ -40,14 +39,14 @@ abstract class Bus(
             .forEach { function -> registerHandler(handler, function) }
     }
 
-    fun <E, I> register(instanceHandler: () -> EntityHandler, repository: EntityTypedRepository<E, I>?) {
+    fun <E, I> register(instanceHandler: () -> Any, repository: EntityTypedRepository<E, I>?) {
         val handler = instanceHandler().javaClass.kotlin
         handler.declaredFunctions
             .filter { function -> functionsWithEffectParameter(function) }
             .forEach { function -> registerHandlerWithEntity(handler, instanceHandler, function, repository) }
     }
 
-    fun register(instanceHandler: () -> EntityHandler) {
+    fun register(instanceHandler: () -> Any) {
         register<Any, Any>(instanceHandler, null)
     }
 
@@ -64,8 +63,8 @@ abstract class Bus(
     }
 
     private fun <E, I> registerHandlerWithEntity(
-        handler: KClass<out EntityHandler>,
-        handlerInstance: () -> EntityHandler,
+        handler: KClass<out Any>,
+        handlerInstance: () -> Any,
         function: KFunction<*>,
         repository: EntityTypedRepository<E, I>?
     ) {
@@ -76,7 +75,7 @@ abstract class Bus(
         }
     }
 
-    private fun registerHandlerWithEntityConstructor(handlerInstance: () -> EntityHandler, function: KFunction<*>) {
+    private fun registerHandlerWithEntityConstructor(handlerInstance: () -> Any, function: KFunction<*>) {
         val effectType = function.parameters[1].type.jvmErasure
         @Suppress("UNCHECKED_CAST")
         handlers
@@ -85,8 +84,8 @@ abstract class Bus(
     }
 
     private fun <E, I> registerHandlerWithEntityFromRepository(
-        handlerInstance: () -> EntityHandler,
-        handler: KClass<out EntityHandler>,
+        handlerInstance: () -> Any,
+        handler: KClass<out Any>,
         function: KFunction<*>,
         repository: EntityTypedRepository<E, I>?
     ) {

@@ -5,7 +5,10 @@ import io.kotest.matchers.shouldBe
 import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.bus.domain.association.Associate
 import org.jordillonch.kes.cqrs.bus.domain.association.Associator
-import org.jordillonch.kes.cqrs.bus.domain.entity.*
+import org.jordillonch.kes.cqrs.bus.domain.entity.EntityCreated
+import org.jordillonch.kes.cqrs.bus.domain.entity.EntityDeleted
+import org.jordillonch.kes.cqrs.bus.domain.entity.EntityUpdated
+import org.jordillonch.kes.cqrs.bus.domain.entity.IdentifiedEntity
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationIdsRepositoryInMemory
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationTypesRepositoryInMemory
 import org.jordillonch.kes.cqrs.bus.infrastructure.BusSequential
@@ -58,7 +61,7 @@ data class FirstStepAnotherEntity(val id: UUID) : AnotherEntity(id)
 data class SecondStepAnotherEntity(val id: UUID) : AnotherEntity(id)
 data class FinalStepAnotherEntity(val id: UUID) : AnotherEntity(id)
 
-class AHandlerWithGenericEntity : EntityHandler {
+class AHandlerWithGenericEntity {
 
     fun on(command: StartCommand): List<Effect> {
         val entity = FirstStepAnotherEntity(command.id)

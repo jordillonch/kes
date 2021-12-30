@@ -7,7 +7,10 @@ import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.bus.domain.Event
 import org.jordillonch.kes.cqrs.bus.domain.association.Associate
 import org.jordillonch.kes.cqrs.bus.domain.association.Associator
-import org.jordillonch.kes.cqrs.bus.domain.entity.*
+import org.jordillonch.kes.cqrs.bus.domain.entity.EntityCreated
+import org.jordillonch.kes.cqrs.bus.domain.entity.EntityDeleted
+import org.jordillonch.kes.cqrs.bus.domain.entity.EntityTypedRepository
+import org.jordillonch.kes.cqrs.bus.domain.entity.EntityUpdated
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationIdsRepositoryInMemory
 import org.jordillonch.kes.cqrs.bus.infrastructure.AssociationTypesRepositoryInMemory
 import org.jordillonch.kes.cqrs.bus.infrastructure.BusSequential
@@ -60,7 +63,7 @@ data class FirstStepSomeEntity(val id: UUID) : SomeEntity(id)
 data class SecondStepSomeEntity(val id: UUID) : SomeEntity(id)
 data class FinalStepSomeEntity(val id: UUID) : SomeEntity(id)
 
-class AHandlerWithEntity : EntityHandler {
+class AHandlerWithEntity {
 
     fun on(command: StartCommand): List<Effect> {
         val entity = FirstStepSomeEntity(command.id)

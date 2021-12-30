@@ -6,7 +6,6 @@ import org.jordillonch.kes.cqrs.bus.domain.Effect
 import org.jordillonch.kes.cqrs.bus.domain.association.Associate
 import org.jordillonch.kes.cqrs.bus.domain.association.Associator
 import org.jordillonch.kes.cqrs.bus.domain.entity.IdentifiedEntity
-import org.jordillonch.kes.cqrs.bus.domain.saga.SagaHandler
 import org.jordillonch.kes.cqrs.bus.domain.saga.SagaStateCreated
 import org.jordillonch.kes.cqrs.bus.domain.saga.SagaStateDeleted
 import org.jordillonch.kes.cqrs.bus.domain.saga.SagaStateUpdated
@@ -62,7 +61,7 @@ data class FirstStepSagaState(val id: UUID) : TestSagaState(id)
 data class SecondStepSagaState(val id: UUID) : TestSagaState(id)
 data class FinalStepSagaState(val id: UUID) : TestSagaState(id)
 
-class TestSaga : SagaHandler {
+class TestSaga {
 
     fun on(command: StartCommand): List<Effect> {
         val entity = FirstStepSagaState(command.id)
