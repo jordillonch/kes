@@ -57,13 +57,11 @@ class BusSequentialSagaTest : ShouldSpec({
 sealed class TestSagaState(private val id_: UUID) : IdentifiedEntity {
     override fun primaryId(): Any = id_
 }
-
 data class FirstStepSagaState(val id: UUID) : TestSagaState(id)
 data class SecondStepSagaState(val id: UUID) : TestSagaState(id)
 data class FinalStepSagaState(val id: UUID) : TestSagaState(id)
 
 class TestSaga {
-
     fun on(command: StartCommand): List<Effect> {
         val entity = FirstStepSagaState(command.id)
         return listOf(

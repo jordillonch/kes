@@ -53,13 +53,11 @@ class BusSequentialHandlersWithEntityGenericTest : ShouldSpec({
 sealed class AnotherEntity(private val id_: UUID): IdentifiedEntity {
     override fun primaryId(): Any = id_
 }
-
 data class FirstStepAnotherEntity(val id: UUID) : AnotherEntity(id)
 data class SecondStepAnotherEntity(val id: UUID) : AnotherEntity(id)
 data class FinalStepAnotherEntity(val id: UUID) : AnotherEntity(id)
 
 class AHandlerWithGenericEntity {
-
     fun on(command: StartCommand): List<Effect> {
         val entity = FirstStepAnotherEntity(command.id)
         return listOf(

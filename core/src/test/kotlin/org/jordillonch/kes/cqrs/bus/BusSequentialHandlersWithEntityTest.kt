@@ -55,13 +55,11 @@ class BusSequentialHandlersWithEntityTest : ShouldSpec({
 })
 
 sealed class SomeEntity(val id_: UUID)
-
 data class FirstStepSomeEntity(val id: UUID) : SomeEntity(id)
 data class SecondStepSomeEntity(val id: UUID) : SomeEntity(id)
 data class FinalStepSomeEntity(val id: UUID) : SomeEntity(id)
 
 class AHandlerWithEntity {
-
     fun on(command: StartCommand): List<Effect> {
         val entity = FirstStepSomeEntity(command.id)
         return listOf(
