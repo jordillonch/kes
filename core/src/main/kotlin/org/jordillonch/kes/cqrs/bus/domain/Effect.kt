@@ -4,5 +4,3 @@ interface Effect
 
 interface Command : Effect
 interface Event : Effect
-
-interface EffectsHandler

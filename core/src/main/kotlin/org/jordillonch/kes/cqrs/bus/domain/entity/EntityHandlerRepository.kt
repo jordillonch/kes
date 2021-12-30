@@ -1,11 +1,10 @@
 package org.jordillonch.kes.cqrs.bus.domain.entity
 
 import org.jordillonch.kes.cqrs.bus.domain.Effect
-import org.jordillonch.kes.cqrs.bus.domain.EffectsHandler
 import org.jordillonch.kes.cqrs.bus.domain.Event
 import kotlin.reflect.KClass
 
-class EntityHandlerRepository(private val genericRepository: GenericRepository) : EffectsHandler {
+class EntityHandlerRepository(private val genericRepository: GenericRepository) {
     private val repositories: MutableMap<KClass<*>, Repository<Any, Any>> = mutableMapOf()
 
     fun <E, I> register(repository: Repository<E, I>, entityType: KClass<*>) {

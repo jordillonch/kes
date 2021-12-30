@@ -34,7 +34,7 @@ abstract class Bus(
 
     fun handlers(effectName: String) = handlers.getOrDefault(effectName, mutableListOf())
 
-    fun register(handler: EffectsHandler) {
+    fun register(handler: Any) {
         handler.javaClass.kotlin.declaredFunctions
             .filter { function -> functionsWithEffectParameter(function) }
             .forEach { function -> registerHandler(handler, function) }
@@ -55,7 +55,7 @@ abstract class Bus(
 
     fun push(effects: List<Effect>) = effects.forEach { push(it) }
 
-    private fun registerHandler(handler: EffectsHandler, function: KFunction<*>) {
+    private fun registerHandler(handler: Any, function: KFunction<*>) {
         val effectType = function.parameters[1].type.jvmErasure
         @Suppress("UNCHECKED_CAST")
         handlers
