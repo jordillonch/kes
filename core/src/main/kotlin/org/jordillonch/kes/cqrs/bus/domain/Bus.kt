@@ -31,6 +31,8 @@ abstract class Bus(
 
     fun removeFirstQueueElement() = queue.removeFirst()
 
+    fun events() = queue.toList()
+
     fun handlers(effectName: String) = handlers.getOrDefault(effectName, mutableListOf())
 
     fun register(handler: Any) {
