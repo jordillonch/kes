@@ -7,6 +7,7 @@ import org.jordillonch.kes.cqrs.query.domain.QueryHandler
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.jvm.ExperimentalReflectionOnLambdas
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.reflect
 
@@ -30,6 +31,7 @@ class SimpleQueryBus : QueryBus {
             ?: throw NoQueryHandlerFoundException()
     }
 
+    @OptIn(ExperimentalReflectionOnLambdas::class)
     private fun <Q : Query, R> classFrom(handler: (Q) -> R) =
         handler.reflect()!!.parameters.first().type.toString()
 
