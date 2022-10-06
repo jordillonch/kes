@@ -19,7 +19,7 @@ class SimpleQueryBusTest : ShouldSpec(
             val testValue = Faker.instance().number().randomNumber()
             val query = TestQuery(testValue)
 
-            bus.ask<Long>(query) shouldBe testValue
+            bus.ask(query) shouldBe testValue
         }
 
         should("register a lambda handler and then query it") {
@@ -30,18 +30,18 @@ class SimpleQueryBusTest : ShouldSpec(
             val testValue = Faker.instance().number().randomNumber()
             val query = TestQuery(testValue)
 
-            bus.ask<Long>(query) shouldBe testValue
+            bus.ask(query) shouldBe testValue
         }
 
         should("fail because no registered handler") {
             val bus = SimpleQueryBus()
             shouldThrow<NoQueryHandlerFoundException> {
-                bus.ask<Int>(TestQuery(1))
+                bus.ask(TestQuery(1))
             }
         }
     })
 
-private data class TestQuery(val id: Long) : Query
+private data class TestQuery(val id: Long) : Query<Long>
 
 private class TestQueryHandler : QueryHandler<TestQuery, Long> {
     override fun on(query: TestQuery): Long {

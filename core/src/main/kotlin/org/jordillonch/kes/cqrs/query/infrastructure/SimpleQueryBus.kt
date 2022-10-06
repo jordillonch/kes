@@ -12,19 +12,19 @@ import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.reflect
 
 class SimpleQueryBus : QueryBus {
-    private val handlers: MutableMap<String, (Query) -> Any> = mutableMapOf()
+    private val handlers: MutableMap<String, (Query<*>) -> Any> = mutableMapOf()
 
-    override fun <Q : Query> registerHandler(handler: QueryHandler<Q, *>) {
+    override fun <Q : Query<*>> registerHandler(handler: QueryHandler<Q, *>) {
         @Suppress("UNCHECKED_CAST")
-        handlers[classFrom(handler)] = { query: Query -> handler.on(query as Q)!! }
+        handlers[classFrom(handler)] = { query: Query<*> -> handler.on(query as Q)!! }
     }
 
-    override fun <Q : Query, R> registerHandler(handler: (Q) -> R) {
+    override fun <Q : Query<R>, R> registerHandler(handler: (Q) -> R) {
         @Suppress("UNCHECKED_CAST")
-        handlers[classFrom(handler)] = handler as (Query) -> Any
+        handlers[classFrom(handler)] = handler as (Query<*>) -> Any
     }
 
-    override fun <R> ask(query: Query): R {
+    override fun <R> ask(query: Query<R>): R {
         @Suppress("UNCHECKED_CAST")
         return handlers[query::class.qualifiedName]
             ?.invoke(query) as R
@@ -32,10 +32,10 @@ class SimpleQueryBus : QueryBus {
     }
 
     @OptIn(ExperimentalReflectionOnLambdas::class)
-    private fun <Q : Query, R> classFrom(handler: (Q) -> R) =
+    private fun <Q : Query<R>, R> classFrom(handler: (Q) -> R) =
         handler.reflect()!!.parameters.first().type.toString()
 
-    private fun <Q : Query> classFrom(handler: QueryHandler<Q, *>) =
+    private fun <Q : Query<*>> classFrom(handler: QueryHandler<Q, *>) =
         handler.javaClass.kotlin
             .declaredFunctions
             .firstFunctionNamedOn()
